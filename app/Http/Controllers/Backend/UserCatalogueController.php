@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Services\Interfaces\UserCatalogueServiceInterface as UserCatalogueService;
+use App\Repositories\Interfaces\UserCatalogueRepositoryInterface as UserCatalogueRepository;
 
 // tạo lại, chưa đổi vì nó sẽ báo lỗi
 use App\Http\Requests\StoreUserCatalogueRequest;
@@ -18,8 +19,10 @@ class UserCatalogueController extends Controller
     // Constructor
     public function __construct(
         UserCatalogueService $userCatalogueService,
+        UserCatalogueRepository $userCatalogueRepository,
     ){
         $this->userCatalogueService = $userCatalogueService;
+        $this->userCatalogueRepository = $userCatalogueRepository;
     }
 
     // Index
@@ -73,34 +76,23 @@ class UserCatalogueController extends Controller
     // Edit
     public function edit($id) {
 
-        $user = $this->userCatalogueRepository->findById($id);
-        $provinces = $this->provinceRepository->all();
-        $config = [
-            'css' => [
-                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-            ],
-            'js' => [
-                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
-                'backend/library/location.js',
-            ],
-        ];
+        $userCatalogue = $this->userCatalogueRepository->findById($id);
         $config['seo'] = config('apps.usercatalogue');
         $config['method'] = 'edit';
         $template = 'backend.user.catalogue.store';
         return view('backend.dashboard.layout', compact(
             'template',
             'config',
-            'provinces',
-            'user',
+            'userCatalogue',
         ));
 
     }
 
     // Update
-    public function update($id, UpdateUserRequest $request) {
+    public function update($id, StoreUserCatalogueRequest $request) {
         if($this->userCatalogueService->update($id, $request)) {
             toastr()->success("Cập nhật bản ghi thành công.");
-            return redirect()->route('user.catalogue.catalogue.index');
+            return redirect()->route('user.catalogue.index');
         }
         toastr()->error("Cập nhật bản ghi không thành công.");
         return redirect()->route('user.catalogue.index');
@@ -110,12 +102,12 @@ class UserCatalogueController extends Controller
     public function delete($id) {
 
         $config['seo'] = config('apps.usercatalogue');
-        $user = $this->userCatalogueRepository->findById($id);
+        $userCatalogue = $this->userCatalogueRepository->findById($id);
         $template = 'backend.user.catalogue.delete';
         return view('backend.dashboard.layout', compact(
             'template',
             'config',
-            'user',
+            'userCatalogue',
         ));
 
     }

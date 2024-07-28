@@ -1,4 +1,4 @@
-<form action="{{ route('user.index') }}" method="get">
+<form action="{{ route('user.catalogue.index') }}" method="get">
 
     <div class="filter-wrapper">
 

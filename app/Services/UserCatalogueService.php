@@ -127,6 +127,6 @@ class UserCatalogueService implements UserCatalogueServiceInterface
     }
 
     private function paginateSelect() {
-        return ['id', 'name', 'description'];
+        return ['id', 'name', 'description', 'publish'];
     }
 }

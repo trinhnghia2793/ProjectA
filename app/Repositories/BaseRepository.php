@@ -28,6 +28,12 @@ class BaseRepository implements BaseRepositoryInterface
             if(isset($condition['keyword']) && !empty($condition['keyword'])) {
                 $query->where('name', 'LIKE', '%'.$condition['keyword'].'%');
             }
+
+            if(isset($condition['publish']) && $condition['publish'] != -1) {
+                $query->where('publish', '=', $condition['publish']);
+            }
+
+            return $query;
         });
         if(!empty($join)) {
             $query->join(...$join);

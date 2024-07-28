@@ -12,6 +12,6 @@ interface UserCatalogueServiceInterface
     public function paginate($request);
 
     public function create(Request $request);
-    // public function update($id, $request);
-    // public function destroy($id);
+    public function update($id, $request);
+    public function destroy($id);
 }
