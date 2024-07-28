@@ -40,9 +40,7 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         DB::beginTransaction();
         try {
 
-            $payload = $request->except(['_token', 'send', 're_password']);
-            $payload['birthday'] = $this->convertBirthdayDate($payload['birthday']);
-            $payload['password'] = Hash::make($payload['password']);
+            $payload = $request->except(['_token', 'send']);
             $user = $this->userCatalogueRepository->create($payload);
             DB::commit();
             return true;
@@ -60,7 +58,6 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         try {
 
             $payload = $request->except(['_token', 'send']);
-            $payload['birthday'] = $this->convertBirthdayDate($payload['birthday']);
             $user = $this->userCatalogueRepository->update($id, $payload);
             DB::commit();
             return true;
@@ -130,6 +127,6 @@ class UserCatalogueService implements UserCatalogueServiceInterface
     }
 
     private function paginateSelect() {
-        return ['id', 'name', 'email', 'phone', 'address', 'publish'];
+        return ['id', 'name', 'description'];
     }
 }

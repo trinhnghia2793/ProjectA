@@ -8,8 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\Interfaces\UserCatalogueServiceInterface as UserCatalogueService;
 
 // tạo lại, chưa đổi vì nó sẽ báo lỗi
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\StoreUserCatalogueRequest;
 
 class UserCatalogueController extends Controller
 {
@@ -27,7 +26,6 @@ class UserCatalogueController extends Controller
     public function index(Request $request) {
 
         $userCatalogues = $this->userCatalogueService->paginate($request);
-
 
         $config = [
             'js' => [
@@ -52,15 +50,6 @@ class UserCatalogueController extends Controller
     // Create user
     public function create() {
 
-        $config = [
-            'css' => [
-                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-            ],
-            'js' => [
-                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
-                'backend/library/location.js',
-            ],
-        ];
         $config['seo'] = config('apps.usercatalogue');
         $config['method'] = 'create';
         $template = 'backend.user.catalogue.store';
@@ -72,13 +61,13 @@ class UserCatalogueController extends Controller
     }
 
     // Store data
-    public function store(StoreUserRequest $request) {
+    public function store(StoreUserCatalogueRequest $request) {
         if($this->userCatalogueService->create($request)) {
             toastr()->success("Thêm mới bản ghi thành công.");
-            return redirect()->route('user.index');
+            return redirect()->route('user.catalogue.index');
         }
         toastr()->error("Thêm mới bản ghi không thành công.");
-        return redirect()->route('user.index');
+        return redirect()->route('user.catalogue.index');
     }
 
     // Edit
@@ -111,10 +100,10 @@ class UserCatalogueController extends Controller
     public function update($id, UpdateUserRequest $request) {
         if($this->userCatalogueService->update($id, $request)) {
             toastr()->success("Cập nhật bản ghi thành công.");
-            return redirect()->route('user.index');
+            return redirect()->route('user.catalogue.catalogue.index');
         }
         toastr()->error("Cập nhật bản ghi không thành công.");
-        return redirect()->route('user.index');
+        return redirect()->route('user.catalogue.index');
     }
 
     // Delete
@@ -135,9 +124,9 @@ class UserCatalogueController extends Controller
     public function destroy($id) {
         if($this->userCatalogueService->destroy($id)) {
             toastr()->success("Xóa bản ghi thành công.");
-            return redirect()->route('user.index');
+            return redirect()->route('user.catalogue.index');
         }
         toastr()->error("Xóa bản ghi không thành công.")    ;
-        return redirect()->route('user.index');
+        return redirect()->route('user.catalogue.index');
     }
 }
