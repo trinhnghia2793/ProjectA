@@ -1,6 +1,12 @@
+@php
+// Lấy ra tên miền để so sánh với name trong config.module --> active cái menu đang mở bên sidebar
+$segment = request()->segment(1); 
+@endphp
+
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul class="nav metismenu" id="side-menu">
+            {{-- Header --}}
             <li class="nav-header">
                 <div class="dropdown profile-element"> <span>
                         <img alt="image" class="img-circle" src="img/profile_small.jpg" />
@@ -20,14 +26,20 @@
                     IN+
                 </div>
             </li>
-            <li class="active">
-                <a href="#"><i class="fa fa-th-large"></i> <span class="nav-label">QL thành viên</span> <span class="fa arrow"></span></a>
+            @foreach(config('apps.module.module') as $key => $val)
+
+            <li class="{{ ($segment == $val['name'] ? 'active' : '') }}">
+                <a href="#"><i class="{{ $val['icon'] }}"></i><span class="nav-label">{{ $val['title'] }}</span> <span class="fa arrow"></span></a>
+                @if(isset($val['subModule']))
                 <ul class="nav nav-second-level">
-                    <li><a href="{{ route('user.catalogue.index') }}">QL nhóm thành viên</a></li>
-                    <li><a href="{{ route('user.index') }}">QL thành viên</a></li>
-                           
+                    @foreach($val['subModule'] as $module)
+                    <li><a href="{{ $module['route'] }}">{{ $module['title'] }}</a></li>
+                    @endforeach
                 </ul>
+                @endif
             </li>
+
+            @endforeach
         </ul>
 
     </div>

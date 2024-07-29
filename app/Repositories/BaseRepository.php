@@ -23,21 +23,35 @@ class BaseRepository implements BaseRepositoryInterface
         array $join = [],
         array $extend = [],
         int $perPage = 1,
+        array $relations = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
+            // Tìm kiếm theo keyword
             if(isset($condition['keyword']) && !empty($condition['keyword'])) {
                 $query->where('name', 'LIKE', '%'.$condition['keyword'].'%');
             }
 
-            if(isset($condition['publish']) && $condition['publish'] != -1) {
+            // Tìm kiếm theo tình trạng publish
+            if(isset($condition['publish']) && $condition['publish'] != 0) {
                 $query->where('publish', '=', $condition['publish']);
             }
 
             return $query;
         });
+
+        // Mối quan hệ giữa các bảng
+        if(isset($relations) && !empty($relations)) {
+            foreach ($relations as $relation) {
+                $query->withCount($relation);
+            }
+        }
+
+        // Join giữa các bảng
         if(!empty($join)) {
             $query->join(...$join);
         }
+
+        // Trả về & phân trang
         return $query->paginate($perPage)
                     ->withQueryString()
                     ->withPath(env('APP_URL').$extend['path']);

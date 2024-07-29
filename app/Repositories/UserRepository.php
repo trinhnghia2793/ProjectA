@@ -23,6 +23,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         array $join = [],
         array $extend = [],
         int $perPage = 1,
+        array $relations = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             if(isset($condition['keyword']) && !empty($condition['keyword'])) {
@@ -31,14 +32,18 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
                       ->orWhere('address', 'LIKE', '%'.$condition['keyword'].'%')
                       ->orWhere('phone', 'LIKE', '%'.$condition['keyword'].'%');
             }
-            if(isset($condition['publish']) && $condition['publish'] != -1) {
+            if(isset($condition['publish']) && $condition['publish'] != 0) {
                 $query->where('publish', '=', $condition['publish']);
             }
             return $query;
-        });
+        })->with('user_catalogues');
+
+        // Join các bảng
         if(!empty($join)) {
             $query->join(...$join);
         }
+
+        // Trả về danh sách + phân trang
         return $query->paginate($perPage)
                     ->withQueryString()
                     ->withPath(env('APP_URL').$extend['path']);

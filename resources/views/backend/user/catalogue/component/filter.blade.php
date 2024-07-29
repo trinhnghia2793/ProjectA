@@ -23,12 +23,10 @@
                 <div class="uk-flex uk-flex-middle">
 
                     @php
-                        $publishArray = ['Không xuất bản', 'Xuất bản'];
                         $publish = request('publish') ?: old('publish');
                     @endphp
                     <select name="publish" class="form-control mr10 setupSelect2">
-                        <option value="-1" selected="selected">Chọn tình trạng</option>
-                        @foreach ($publishArray as $key => $val)
+                        @foreach (config('apps.general.publish') as $key => $val)
                             <option {{ ($publish == $key) ? 'selected' : '' }} value="{{ $key }}">{{ $val }}</option>
                         @endforeach
                     </select>
