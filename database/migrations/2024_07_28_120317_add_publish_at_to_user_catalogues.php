@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Thêm cột publish_at vào bảng user_catalogues
     public function up(): void
     {
         Schema::table('user_catalogues', function (Blueprint $table) {

@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Tạo bảng jobs (?)
     public function up(): void
     {
         Schema::create('jobs', function (Blueprint $table) {

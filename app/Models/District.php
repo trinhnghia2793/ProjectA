@@ -17,6 +17,7 @@ class District extends Model
     protected $primaryKey = 'code';
     public $incrementing = false;
 
+    // Mối quan hệ
     public function provinces() {
         return $this->belongsTo(Province::class, 'province_code', 'code');
     }

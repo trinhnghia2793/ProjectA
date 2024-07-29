@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Menu Sidebar
 return [
     'module' => [
         // Quản lý thành viên

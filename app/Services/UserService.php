@@ -23,6 +23,7 @@ class UserService implements UserServiceInterface
         $this->userRepository = $userRepository;
     }   
 
+    // Truy vấn users & phân trang
     public function paginate($request) {
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
@@ -33,6 +34,7 @@ class UserService implements UserServiceInterface
         return $users;
     }
 
+    // Tạo user
     public function create(Request $request) {
         DB::beginTransaction();
         try {
@@ -52,6 +54,7 @@ class UserService implements UserServiceInterface
         }
     }
 
+    // Cập nhật user
     public function update($id, $request) {
         DB::beginTransaction();
         try {
@@ -70,6 +73,7 @@ class UserService implements UserServiceInterface
         }
     }
 
+    // Xóa user
     public function destroy($id) {
         DB::beginTransaction();
         try {
@@ -86,6 +90,7 @@ class UserService implements UserServiceInterface
         }
     }
 
+    // Cập nhật trạng thái của user
     public function updateStatus($post = []) {
         DB::beginTransaction();
         try {
@@ -103,6 +108,7 @@ class UserService implements UserServiceInterface
         }
     }
 
+    // Cập nhật trạng thái của các user được chọn
     public function updateStatusAll($post) {
         DB::beginTransaction();
         try {
@@ -120,12 +126,14 @@ class UserService implements UserServiceInterface
         }
     }
 
+    // Chuyển đổi ngày tháng (dùng trong trường ngày sinh)
     private function convertBirthdayDate($birthday = '') {
         $carbonDate = Carbon::createFromFormat('Y-m-d', $birthday);
         $birthday = $carbonDate->format('Y-m-d H:i:s');
         return $birthday;
     }
 
+    // Chọn những thuộc tính dùng để hiện phân trang
     private function paginateSelect() {
         return [
         'id', 

@@ -79,7 +79,7 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         }
     }
 
-    // Xóa (có lẽ là xóa mềm)
+    // Xóa (có lẽ là đang xóa mềm)
     public function destroy($id) {
         DB::beginTransaction();
         try {

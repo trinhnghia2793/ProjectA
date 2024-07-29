@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Tạo bảng cache (?)
     public function up(): void
     {
         Schema::create('cache', function (Blueprint $table) {

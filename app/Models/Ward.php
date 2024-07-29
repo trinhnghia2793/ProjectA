@@ -17,6 +17,7 @@ class Ward extends Model
     protected $primaryKey = 'code';
     public $incrementing = false;
 
+    // Mối quan hệ
     public function districts() {
         return $this->belongsTo(District::class, 'district_code', 'code');
     }

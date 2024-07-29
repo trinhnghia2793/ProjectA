@@ -14,6 +14,7 @@ class LoginMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+    
     // Nếu đã đăng nhập rồi mà còn vào login thì dắt qua dashboard
     public function handle(Request $request, Closure $next): Response
     {

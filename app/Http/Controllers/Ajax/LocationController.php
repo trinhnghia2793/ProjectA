@@ -7,6 +7,7 @@ use App\Repositories\Interfaces\DistrictRepositoryInterface as DistrictRepositor
 use App\Repositories\Interfaces\ProvinceRepositoryInterface as ProvinceRepository;
 use Illuminate\Http\Request;
 
+// Chọn Tỉnh - Huyện - Xã
 class LocationController extends Controller
 {
     protected $districtRepository;

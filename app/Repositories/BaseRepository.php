@@ -17,6 +17,7 @@ class BaseRepository implements BaseRepositoryInterface
         $this->model = $model;
     }
 
+    // Truy vấn & phân trang
     public function pagination(
         array $column = ['*'], 
         array $condition = [], 
@@ -57,32 +58,39 @@ class BaseRepository implements BaseRepositoryInterface
                     ->withPath(env('APP_URL').$extend['path']);
     }
 
+    // Tạo
     public function create(array $payload = []) {
         $model = $this->model->create($payload);
         return $model->fresh();
     }
 
+    // Cập nhật
     public function update(int $id = 0, array $payload = []) {
         $model = $this->findById($id);
         return $model->update($payload);
     }
 
+    // Cập nhật theo where
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []) {
         return $this->model->whereIn($whereInField, $whereIn)->update($payload);
     }
 
+    // Xóa (hình như là xoá mềm thì phải)
     public function delete(int $id = 0) {
         return $this->findById($id)->delete();
     }
 
+    // Xóa bắt buộc
     public function forceDelete(int $id = 0) {
         return $this->findById($id)->forceDelete();
     }
 
+    // Tất cả (chắc chả thèm dùng)
     public function all() {
         return $this->model->all();
     }
 
+    // Tìm theo Id
     public function findById(
         int $modelId,
         array $column = ['*'],

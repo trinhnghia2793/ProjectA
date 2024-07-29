@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Thêm cột deleted_at vào bảng users
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {

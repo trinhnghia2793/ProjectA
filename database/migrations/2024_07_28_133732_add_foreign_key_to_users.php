@@ -11,6 +11,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Thêm khóa ngoại từ users(user_catalogue_id) --> user_catalogues(id)
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {

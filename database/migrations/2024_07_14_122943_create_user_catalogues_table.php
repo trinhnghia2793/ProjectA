@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Tạo bảng user_catalogues (Loại người dùng - Quyền)
     public function up(): void
     {
         Schema::create('user_catalogues', function (Blueprint $table) {

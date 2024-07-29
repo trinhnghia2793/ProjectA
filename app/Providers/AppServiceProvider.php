@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
-
+    // Nơi khai báo các services (chắc là vậy)
     public $servicesBindings = [
         // User
         'App\Services\Interfaces\UserServiceInterface' => 'App\Services\UserService',

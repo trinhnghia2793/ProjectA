@@ -10,11 +10,11 @@ return new class extends Migration
      * Run the migrations.
      */
 
-    // Thêm cột publish_at vào bảng users
+    // Thêm cột deleted_at vào bảng languages
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->tinyInteger('publish')->default(0);
+        Schema::table('languages', function (Blueprint $table) {
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('publish');
-       });
+        Schema::table('languages', function (Blueprint $table) {
+            $table->dropColumn('deleted_at');
+        });
     }
 };

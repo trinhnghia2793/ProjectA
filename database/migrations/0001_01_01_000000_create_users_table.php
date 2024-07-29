@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    // Tạo bảng users (Người dùng)
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
