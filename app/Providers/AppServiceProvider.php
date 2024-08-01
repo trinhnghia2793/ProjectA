@@ -16,6 +16,10 @@ class AppServiceProvider extends ServiceProvider
         // User catalogue
         'App\Services\Interfaces\UserCatalogueServiceInterface' => 'App\Services\UserCatalogueService',
         'App\Repositories\Interfaces\UserCatalogueRepositoryInterface' => 'App\Repositories\UserCatalogueRepository',
+
+        // Language
+        'App\Services\Interfaces\LanguageServiceInterface' => 'App\Services\LanguageService',
+        'App\Repositories\Interfaces\LanguageRepositoryInterface' => 'App\Repositories\LanguageRepository',
        
         // Province, district
         'App\Repositories\Interfaces\ProvinceRepositoryInterface' => 'App\Repositories\ProvinceRepository',

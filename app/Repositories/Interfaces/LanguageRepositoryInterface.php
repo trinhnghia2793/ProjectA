@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
-interface UserCatalogueRepositoryInterface
+interface LanguageRepositoryInterface
 {
     // Khai báo để chống báo lỗi
     public function pagination(

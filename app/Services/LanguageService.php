@@ -2,31 +2,28 @@
 
 namespace App\Services;
 
-use App\Services\Interfaces\UserCatalogueServiceInterface;
-use App\Repositories\Interfaces\UserCatalogueRepositoryInterface as UserCatalogueRepository;
-use App\Repositories\Interfaces\UserRepositoryInterface as UserRepository;
+use App\Services\Interfaces\LanguageServiceInterface;
+use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 /**
- * Class UserCatalogueService
+ * Class LanguageService
  * @package App\Services
  */
-class UserCatalogueService implements UserCatalogueServiceInterface
+class LanguageService implements LanguageServiceInterface
 {
-    protected $userCatalogueRepository;
-    protected $userRepository;
+    protected $LanguageRepository;
 
     public function __construct(
-        UserCatalogueRepository $userCatalogueRepository,
-        UserRepository $userRepository
+        LanguageRepository $languageRepository,
     )
     {
-        $this->userCatalogueRepository = $userCatalogueRepository;
-        $this->userRepository = $userRepository;
+        $this->LanguageRepository = $languageRepository;
     }   
 
     // Phân trang
@@ -35,21 +32,21 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
         $perPage = $request->integer('perpage');
-        $userCatalogues = $this->userCatalogueRepository->pagination(
-            $this->paginateSelect(), $condition, [], ['path' => '/user/catalogue/index'], 
+        $languages = $this->LanguageRepository->pagination(
+            $this->paginateSelect(), $condition, [], ['path' => '/language/index'], 
             $perPage,
-            ['users'], // relation
+            [], // relation
         );
-        return $userCatalogues;
+        return $languages;
     }
 
-    // Tạo một UserCatalogue
+    // Tạo một Language
     public function create(Request $request) {
         DB::beginTransaction();
         try {
-
             $payload = $request->except(['_token', 'send']);
-            $user = $this->userCatalogueRepository->create($payload);
+            $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
+            $language = $this->LanguageRepository->create($payload);
             DB::commit();
             return true;
         }
@@ -65,9 +62,8 @@ class UserCatalogueService implements UserCatalogueServiceInterface
     public function update($id, $request) {
         DB::beginTransaction();
         try {
-
             $payload = $request->except(['_token', 'send']);
-            $user = $this->userCatalogueRepository->update($id, $payload);
+            $language = $this->LanguageRepository->update($id, $payload);
             DB::commit();
             return true;
         }
@@ -83,7 +79,7 @@ class UserCatalogueService implements UserCatalogueServiceInterface
     public function destroy($id) {
         DB::beginTransaction();
         try {
-            $user = $this->userCatalogueRepository->delete($id);
+            $language = $this->LanguageRepository->delete($id);
 
             DB::commit();
             return true;
@@ -101,9 +97,9 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         DB::beginTransaction();
         try {
             $payload[$post['field']] = (($post['value'] == 1)?2:1);
-            $user = $this->userCatalogueRepository->update($post['modelId'], $payload);
+            $language = $this->LanguageRepository->update($post['modelId'], $payload);
             // Chuyển tất cả bên User
-            $this->changeUserStatus($post, $payload[$post['field']]);
+            // $this->changeUserStatus($post, $payload[$post['field']]);
             
             DB::commit();
             return true;
@@ -121,9 +117,9 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         DB::beginTransaction();
         try {
             $payload[$post['field']] = $post['value'];
-            $flag = $this->userCatalogueRepository->updateByWhereIn('id', $post['id'], $payload);
+            $flag = $this->LanguageRepository->updateByWhereIn('id', $post['id'], $payload);
             // Chuyển tất cả bên User
-            $this->changeUserStatus($post, $post['value']);
+            // $this->changeUserStatus($post, $post['value']);
             
             DB::commit();
             return true;
@@ -136,33 +132,33 @@ class UserCatalogueService implements UserCatalogueServiceInterface
         }
     }
 
-    // Cập nhật tình trạng của tất cả User khi cập nhật tình trạng của UserCatalogue
-    private function changeUserStatus($post, $value) {
-        DB::beginTransaction();
-        try {
-            $array = [];
-            if(isset($post['modelId'])) {
-                $array[] = $post['modelId'];
-            }
-            else {
-                $array = $post['id'];
-            }    
-            $payload[$post['field']] = $value;
-            $this->userRepository->updateByWhereIn('user_catalogue_id', $array, $payload);
+    // Cập nhật tình trạng của tất cả User khi cập nhật tình trạng của Language
+    // private function changeUserStatus($post, $value) {
+    //     DB::beginTransaction();
+    //     try {
+    //         $array = [];
+    //         if(isset($post['modelId'])) {
+    //             $array[] = $post['modelId'];
+    //         }
+    //         else {
+    //             $array = $post['id'];
+    //         }    
+    //         $payload[$post['field']] = $value;
+    //         $this->userRepository->updateByWhereIn('user_catalogue_id', $array, $payload);
 
-            DB::commit();
-            return true;
-        }
-        catch(\Exception $e) {
-            DB::rollback();
-            echo $e->getMessage();
-            die();
-            return false;
-        }
-    }
-    
+    //         DB::commit();
+    //         return true;
+    //     }
+    //     catch(\Exception $e) {
+    //         DB::rollback();
+    //         echo $e->getMessage();
+    //         die();
+    //         return false;
+    //     }
+    // }
+
     // Chọn những trường cần được phân trang
     private function paginateSelect() {
-        return ['id', 'name', 'description', 'publish'];
+        return ['id', 'name', 'canonical', 'publish'];
     }
 }

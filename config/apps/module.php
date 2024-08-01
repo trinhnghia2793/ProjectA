@@ -7,7 +7,7 @@ return [
     'module' => [
         // Quản lý thành viên
         [
-            'name' => 'user',
+            'name' => ['user'],
             'title' => 'QL THÀNH VIÊN',
             'icon' => 'fa fa-user',
             'subModule' => [
@@ -21,9 +21,10 @@ return [
                 ]
             ]
         ],
+
         // Quản lý bài viết
         [
-            'name' => 'post',
+            'name' => ['post'],
             'title' => 'QL BÀI VIẾT',
             'icon' => 'fa fa-file',
             'subModule' => [
@@ -34,6 +35,19 @@ return [
                 [
                     'title' => 'QL bài viết',
                     'route' => 'post/index'
+                    ]
+                    ]
+                ],
+                
+        // Ngôn ngữ
+        [
+            'name' => ['language'],
+            'title' => 'CẤU HÌNH CHUNG',
+            'icon' => 'fa fa-file',
+            'subModule' => [
+                [
+                    'title' => 'QL ngôn ngữ',
+                    'route' => 'language/index'
                 ]
             ]
         ]

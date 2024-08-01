@@ -3,11 +3,7 @@
 namespace App\Services\Interfaces;
 use Illuminate\Http\Request;
 
-/**
- * Interface UseCataloguerServiceInterface
- * @package App\Services\Interfaces
- */
-interface UserCatalogueServiceInterface
+interface LanguageServiceInterface
 {
     // Khai báo để chống báo lỗi
     public function paginate($request);
