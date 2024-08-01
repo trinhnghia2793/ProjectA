@@ -157,8 +157,8 @@ class LanguageService implements LanguageServiceInterface
     //     }
     // }
 
-    // Chọn những trường cần được phân trang
+    // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {
-        return ['id', 'name', 'canonical', 'publish'];
+        return ['id', 'name', 'canonical', 'publish', 'image'];
     }
 }
