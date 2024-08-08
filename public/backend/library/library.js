@@ -4,6 +4,7 @@
     var HT = {}; 
     var _token = $('meta[name="csrf-token"]').attr('content');
 
+    // Switch bật tắt của publish...
     HT.switchery = () => {
         $('.js-switch').each(function() {
             // let _this = $(this)
@@ -11,12 +12,14 @@
         })
     }
 
+    // Select cho combobox
     HT.select2 = () => {
         if($('.setupSelect2').length) {
             $('.setupSelect2').select2();
         }  
     }
 
+    // Hàm chuyển đổi trạng thái của publish khi bật tắt switchery
     HT.changeStatus = () => {
         if($('.status').length) {
             $(document).on('change', '.status', function(e) {
@@ -50,6 +53,7 @@
         }
     }
 
+    // Chuyển đổi trạng thái của tất cả publish được chọn
     HT.changeStatusAll = () => {
         if($('.changeStatusAll').length) {
             $(document).on('click', '.changeStatusAll', function(e) {
@@ -103,6 +107,7 @@
         }
     }
 
+    // Hàm check tất cả khi check vào ô chọn tất cả + đổi màu
     HT.checkAll = () => {
         if($('#checkAll').length) {
             $(document).on('click', '#checkAll', function(){
@@ -117,6 +122,7 @@
         }
     }
 
+    // Hàm khi được check thì đổi màu
     HT.checkBoxItem = () => {
         if($('.checkBoxItem').length) {
             $(document).on('click', '.checkBoxItem', function() {
@@ -127,6 +133,7 @@
         }
     }
 
+    // Hàm đổi màu các dòng được check
     HT.changeBackground = (object) => {
         let isChecked = object.prop('checked')
         if(isChecked) {
@@ -137,11 +144,13 @@
         }
     }
 
+    // Kiểm tra tất cả có được check chưa, nếu có thì check cho ô check all
     HT.allChecked = () => {
         let allChecked = $('.checkBoxItem:checked').length === $('.checkBoxItem').length;
         $('#checkAll').prop('checked', allChecked);
     }
 
+    // Chạy các hàm
     $(document).ready(function() {
         HT.switchery();
         HT.select2();

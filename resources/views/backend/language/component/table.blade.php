@@ -4,7 +4,7 @@
             <th>
                 <input type="checkbox" value="" id="checkAll" class="input-checkbox">
             </th>
-            <th>Ảnh</th>
+            <th style="width: 100px;">Ảnh</th>
             <th>Tên ngôn ngữ</th>
             <th>Canonical</th>
             <th>Mô tả</th>

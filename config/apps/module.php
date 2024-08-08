@@ -5,6 +5,23 @@ use Illuminate\Support\Facades\Route;
 // Menu Sidebar
 return [
     'module' => [
+        // Quản lý bài viết
+        [
+            'name' => ['post'],
+            'title' => 'QL BÀI VIẾT',
+            'icon' => 'fa fa-file',
+            'subModule' => [
+                [
+                    'title' => 'QL nhóm bài viết',
+                    'route' => 'post/catalogue/index'
+                ],
+                [
+                    'title' => 'QL bài viết',
+                    'route' => 'post/index'
+                ]
+            ]
+        ],
+                
         // Quản lý thành viên
         [
             'name' => ['user'],
@@ -22,23 +39,6 @@ return [
             ]
         ],
 
-        // Quản lý bài viết
-        [
-            'name' => ['post'],
-            'title' => 'QL BÀI VIẾT',
-            'icon' => 'fa fa-file',
-            'subModule' => [
-                [
-                    'title' => 'QL nhóm bài viết',
-                    'route' => 'post/catalogue/index'
-                ],
-                [
-                    'title' => 'QL bài viết',
-                    'route' => 'post/index'
-                    ]
-                    ]
-                ],
-                
         // Ngôn ngữ
         [
             'name' => ['language'],

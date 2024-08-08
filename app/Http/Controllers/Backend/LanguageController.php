@@ -128,6 +128,7 @@ class LanguageController extends Controller
     private function configData() {
         return [
             'js' => [
+                // import ckfinder_2 để upload ảnh
                 'backend/plugins/ckfinder_2/ckfinder.js',
                 'backend/library/finder.js',
             ],

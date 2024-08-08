@@ -85,8 +85,8 @@ Examples:
 
 ATTENTION: The trailing slash is required.
 */
-$baseUrl = '/public/userfiles/';
-
+$baseUrl = '/userfiles/';
+//$baseUrl = '/public/userfiles/';
 
 
 
