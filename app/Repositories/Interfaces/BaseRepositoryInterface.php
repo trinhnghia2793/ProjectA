@@ -4,6 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface BaseRepositoryInterface
 {
+    // Khai báo bắt buộc để BaseRepository tuân theo
     public function pagination(
         array $column = ['*'], 
         array $condition = [], 
@@ -18,4 +19,5 @@ interface BaseRepositoryInterface
     public function update(int $id = 0, array $payload = []);
     public function delete(int $id = 0);
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []);
+    public function createLanguagePivot($model, array $payload = []);
 }

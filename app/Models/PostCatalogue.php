@@ -11,7 +11,7 @@ class PostCatalogue extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'parentId',
+        'parent_id',
         'lft', // left
         'rgt', // right
         'level',
@@ -23,7 +23,17 @@ class PostCatalogue extends Model
         'user_id',
     ];
 
-    protected $table = 'languages';
-
-    // Mối quan hệ
+    // Mối quan hệ với bảng languages
+    public function languages() {
+        return $this->belongsToMany(Language::class, 'post_catalogue_language', 'post_catalogue_id', 'language_id')
+        ->withPivot(
+            'name',
+            'canonical',
+            'meta_title',
+            'meta_keyword',
+            'meta-description',
+            'description',
+            'content'
+        )->withTimestamps();
+    }
 }

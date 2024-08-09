@@ -4,26 +4,34 @@ namespace App\Services;
 
 use App\Services\Interfaces\PostCatalogueServiceInterface;
 use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Classes\Nestedsetbie;
 
 /**
  * Class PostCatalogueService
  * @package App\Services
  */
-class PostCatalogueService implements PostCatalogueServiceInterface
+class PostCatalogueService extends BaseService implements PostCatalogueServiceInterface
 {
     protected $postCatalogueRepository;
+    protected $nestedset;
 
     public function __construct(
         PostCatalogueRepository $postCatalogueRepository,
     )
     {
         $this->postCatalogueRepository = $postCatalogueRepository;
+        $this->nestedset = new Nestedsetbie([
+            'table' => 'post_catalogues',
+            'foreign_key' => 'post_catalogue_id',
+            'language_id' => $this->currentLanguage(),
+        ]);
     }   
 
     // Phân trang
@@ -44,9 +52,24 @@ class PostCatalogueService implements PostCatalogueServiceInterface
     public function create(Request $request) {
         DB::beginTransaction();
         try {
-            $payload = $request->except(['_token', 'send']);
+            $payload = $request->only($this->payload());
             $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
             $postCatalogue = $this->postCatalogueRepository->create($payload);
+
+            // Nếu create ở trên thành công (tức có dòng thêm vào) sẽ tiến hành thêm ở bảng language
+            if($postCatalogue->id > 0) {
+                $payloadLanguage = $request->only($this->payloadLanguage());
+                $payloadLanguage['language_id'] = $this->currentLanguage();
+                $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
+
+                $language = $this->postCatalogueRepository->createLanguagePivot($postCatalogue, $payloadLanguage);
+            }
+
+            // Tính toán lại các giá trị left - right
+            $this->nestedset->Get('level ASC', 'order ASC');
+            $this->nestedset->Recursive(0, $this->nestedset->Set());
+            $this->nestedset->Action();
+
             DB::commit();
             return true;
         }
@@ -159,6 +182,36 @@ class PostCatalogueService implements PostCatalogueServiceInterface
 
     // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {
-        return ['id', 'name', 'canonical', 'publish', 'image'];
+        return [
+            'id', 
+            'name', 
+            'canonical', 
+            'publish', 
+            'image'
+        ];
+    }
+
+    // Những thuộc tính payload cho create & update của PostCatalogue
+    private function payload() {
+        return [
+            'parent_id', 
+            'follow', 
+            'publish', 
+            'image'
+        ]; 
+    }
+
+    // Những thuộc tính payload cho create & update của Language sau khi add PostCatalogue thành công
+    // post_catalogue_language
+    private function payloadLanguage() {
+        return [
+            'name', 
+            'description', 
+            'content', 
+            'meta_title', 
+            'meta_keyword', 
+            'meta_description', 
+            'canonical'
+        ]; 
     }
 }

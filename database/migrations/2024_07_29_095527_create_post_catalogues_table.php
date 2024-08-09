@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('post_catalogues', function (Blueprint $table) {
             $table->id();
-            $table->integer('parentid')->default(0);
+            $table->integer('parentid')->default(0); // sau này bị sửa thành parent_id(sửa chay)
             $table->integer('lft')->default(0); // left
             $table->integer('rgt')->default(0); // right
             $table->integer('level')->default(0); // level

@@ -20,6 +20,18 @@ class Language extends Model
 
     protected $table = 'languages';
 
-    // Mối quan hệ
+    // Mối quan hệ với bảng PostCatalogues
+    public function languages() {
+        return $this->belongsToMany(PostCatalogue::class, 'post_catalogue_translate', 'language_id', 'post_catalogue_id')
+        ->withPivot(
+            'name',
+            'canonical',
+            'meta_title',
+            'meta_keyword',
+            'meta-description',
+            'description',
+            'content'
+        )->withTimestamps();
+    }
     
 }
