@@ -4,9 +4,9 @@
     </div>
     <div class="ibox-content">
         <div class="seo-container">
-            <div class="meta-title">meta title</div>
-            <div class="canonical">http://laravel.com/tu-hoc-laravel.html</div>
-            <div class="meta-description">meta description</div>
+            <div class="meta-title">Bạn chưa có tiêu đề SEO</div>
+            <div class="canonical">https://duong-dan-cua-ban.html</div>
+            <div class="meta-description">Bạn chưa có mô tả SEO</div>
         </div>
         <div class="seo-wrapper">
 
@@ -55,7 +55,17 @@
                         <label for="" class="control-label text-left">
                             <span>Đường dẫn</span>
                         </label>
-                        <input type="text" name="canonical" value="{{ old('canonical', ($postCatalogue->canonical) ?? '' ) }}" class="form-control" placeholder="" autocomplete="off">
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                name="canonical" 
+                                value="{{ old('canonical', ($postCatalogue->canonical) ?? '' ) }}" 
+                                class="form-control" 
+                                placeholder="" 
+                                autocomplete="off"
+                            >
+                            <span class="baseUrl">{{ config('app.url') . '/' }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

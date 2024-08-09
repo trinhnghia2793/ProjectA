@@ -22,4 +22,5 @@
 <script src="backend/js/jquery-3.1.1.min.js"></script>
 <script>
     var BASE_URL = '{{ config('app.url') }}'
+    var SUFFIX = '{{ config('apps.general.suffix') }}'
 </script>

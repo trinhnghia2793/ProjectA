@@ -9,15 +9,19 @@
             $('.ck-editor').each(function() {
                 let editor = $(this)
                 let elementId = editor.attr('id')
-                HT.ckeditor4(elementId)
+                let elementHeight = editor.attr('data-height')
+                HT.ckeditor4(elementId, elementHeight)
             })
         }
     }
 
+    // Hàm Ckeditor4
     HT.ckeditor4 = (elementId, elementHeight) => {
+
         if(typeof(elementHeight) == 'undefined'){
             elementHeight = 500;
         }
+
         CKEDITOR.replace( elementId, {
             height: elementHeight,
             removeButtons: '',
@@ -69,7 +73,7 @@
     // }
 
 
-    // Hàm upload ảnh dùng CkFinder2
+    // Hàm upload ảnh vào input dùng CkFinder2
     HT.uploadImageToInput = () => {
         $('.upload-image').click(function() {
             let input = $(this)
@@ -78,7 +82,16 @@
         })
     }
 
-    // Hàm setup CkFinder2
+    // Hàm upload ảnh avatar
+    HT.uploadImageAvatar = () => {
+        $('.image-target').click(function() {
+            let input = $(this)
+            let type = 'Images'
+            HT.browseServerAvatar(input, type)
+        })
+    }
+
+    // Hàm setup CkFinder2 khi chọn vào vùng ảnh đại diện
     HT.setupCkFinder2 = (object, type) => {
         if(typeof(type) == 'undefined') {
             type = 'Images';
@@ -87,14 +100,29 @@
         finder.resourceType = type;
         finder.selectActionFunction = function( fileUrl, data ) {
             object.val(fileUrl)
-            // object.val('/' + fileUrl)
         }
         finder.popup();
     }
 
+    // Hàm duyệt ảnh để lấy avatar
+    HT.browseServerAvatar = (object, type) => {
+        if(typeof(type) == 'undefined') {
+            type = 'Images';
+        }
+        var finder = new CKFinder();
+        finder.resourceType = type;
+        finder.selectActionFunction = function( fileUrl, data ) {
+            object.find('img').attr('src', fileUrl)
+            object.siblings('input').val(fileUrl)
+        }
+        finder.popup();
+    }
+
+    // Gọi hàm để chạy
     $(document).ready(function() {
         HT.uploadImageToInput();
         HT.setupCkeditor();
+        HT.uploadImageAvatar();
     })
 
 })(jQuery);

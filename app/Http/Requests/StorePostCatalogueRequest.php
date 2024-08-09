@@ -21,8 +21,19 @@ class StorePostCatalogueRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Định nghĩa các rule cho các trường cần nhập
         return [
-            //
+            'name' => 'required',
+            'user_catalogue_id' => 'gt:0',
+        ];
+    }
+
+    public function messages(): array
+    {
+        // Định nghĩa các message khi nhập sai
+        return [
+            'name.required' => "Bạn chưa nhập vào ô tiêu đề.",
+            'user_catalogue_id.gt' => "Bạn chưa chọn danh mục cha.",
         ];
     }
 }

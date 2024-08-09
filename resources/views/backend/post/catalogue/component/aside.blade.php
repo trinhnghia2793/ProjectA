@@ -26,7 +26,7 @@
     <div class="ibox-content">
         <div class="row">
             <div class="col-lg-12">
-                <span class="image img-cover"><img src="backend/img/not-found.jpg" alt=""></span>
+                <span class="image img-cover image-target"><img src="backend/img/not-found.jpg" alt=""></span>
                 <input type="hidden" name="image">
             </div>
         </div>

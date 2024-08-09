@@ -52,7 +52,6 @@ class PostCatalogueController extends Controller
 
     // Create user
     public function create() {
-
         $config = $this->configData();
         $config['seo'] = config('apps.postcatalogue');
         $config['method'] = 'create';
@@ -61,7 +60,6 @@ class PostCatalogueController extends Controller
             'template',
             'config',
         ));
-
     }
 
     // Store data
@@ -76,7 +74,6 @@ class PostCatalogueController extends Controller
 
     // Edit
     public function edit($id) {
-
         $postCatalogue = $this->postCatalogueRepository->findById($id);
         $config = $this->configData();
         $config['seo'] = config('apps.postcatalogue');
@@ -87,7 +84,6 @@ class PostCatalogueController extends Controller
             'config',
             'postCatalogue',
         ));
-
     }
 
     // Update
@@ -102,7 +98,6 @@ class PostCatalogueController extends Controller
 
     // Delete
     public function delete($id) {
-
         $config['seo'] = config('apps.postcatalogue');
         $postCatalogue = $this->postCatalogueRepository->findById($id);
         $template = 'backend.post.catalogue.delete';
@@ -111,7 +106,6 @@ class PostCatalogueController extends Controller
             'config',
             'postCatalogue',
         ));
-
     }
 
     // Destroy
@@ -133,7 +127,10 @@ class PostCatalogueController extends Controller
 
                 // import ckfinder_2 để upload ảnh
                 'backend/plugins/ckfinder_2/ckfinder.js',
+
+                // Add các file js chạy hàm
                 'backend/library/finder.js',
+                'backend/library/seo.js',
 
                 // switchery
                 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'
