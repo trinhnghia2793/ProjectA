@@ -12,6 +12,7 @@ interface BaseRepositoryInterface
         array $extend = [],
         int $perPage = 1,
         array $relations = [],
+        array $orderBy = [],
     );
     public function all();
     public function findById(int $id);

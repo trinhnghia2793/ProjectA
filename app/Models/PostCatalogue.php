@@ -36,4 +36,9 @@ class PostCatalogue extends Model
             'content'
         )->withTimestamps();
     }
+
+    // Mối quan hệ với bảng postCatalogueLanguage
+    public function post_catalogue_language() {
+        return $this->hasMany(PostCatalogueLanguage::class, 'post_catalogue_id', 'id');
+    }
 }

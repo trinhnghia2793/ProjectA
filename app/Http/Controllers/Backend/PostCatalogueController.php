@@ -17,6 +17,7 @@ class PostCatalogueController extends Controller
 {
     protected $postCatalogueService;
     protected $postCatalogueRepository;
+    protected $language;
     
     protected $nestedset;
 
@@ -33,6 +34,8 @@ class PostCatalogueController extends Controller
             'foreign_key' => 'post_catalogue_id',
             'language_id' => 1, // tạm thời đê là 1
         ]);
+
+        $this->language = $this->currentLanguage();
     }
 
     // Index
@@ -60,7 +63,7 @@ class PostCatalogueController extends Controller
 
     }
 
-    // Create user
+    // Create a post catalogue
     public function create() {
         $config = $this->configData();
         $config['seo'] = config('apps.postcatalogue');
@@ -88,14 +91,19 @@ class PostCatalogueController extends Controller
 
     // Edit
     public function edit($id) {
-        $postCatalogue = $this->postCatalogueRepository->findById($id);
+        $postCatalogue = $this->postCatalogueRepository->getPostCatalogueById($id, $this->language);
+
         $config = $this->configData();
         $config['seo'] = config('apps.postcatalogue');
         $config['method'] = 'edit';
+
+        $dropdown = $this->nestedset->Dropdown();
+
         $template = 'backend.post.catalogue.store';
         return view('backend.dashboard.layout', compact(
             'template',
             'config',
+            'dropdown',
             'postCatalogue',
         ));
     }

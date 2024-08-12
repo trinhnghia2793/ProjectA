@@ -39,7 +39,7 @@
 
                     <select name="user_catalouge_id" class="form-control mr10 setupSelect2">
                         <option value="0" selected="selected">Chọn nhóm thành viên</option>
-                        <option value="1">Quản trị viên</option>
+                        <option value="2">Quản trị viên</option>
                     </select>
 
                     <div class="uk-search uk-flex uk-flex-middle mr10">

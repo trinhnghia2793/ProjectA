@@ -41,10 +41,19 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         $condition['publish'] = $request->integer('publish');
         $perPage = $request->integer('perpage');
         $postCatalogues = $this->postCatalogueRepository->pagination(
-            $this->paginateSelect(), $condition, [], ['path' => '/PostCatalogue/index'], 
+            $this->paginateSelect(), 
+            $condition, 
+            [
+                ['post_catalogue_language as tb2', 'tb2.post_catalogue_id', '=' , 'post_catalogues.id'] // val[0], val[1], val[2], val[3] bên base repository
+            ], 
+            ['path' => 'post.catalogue.index'], 
             $perPage,
             [], // relation
+            [
+                'post_catalogues.lft', 'ASC'
+            ] // order by
         );
+
         return $postCatalogues;
     }
 
@@ -183,11 +192,13 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
     // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {
         return [
-            'id', 
-            'name', 
-            'canonical', 
-            'publish', 
-            'image'
+            'post_catalogues.id', 
+            'post_catalogues.publish', 
+            'post_catalogues.image', 
+            'post_catalogues.level', 
+            'post_catalogues.order', 
+            'tb2.name', 
+            'tb2.canonical',
         ];
     }
 

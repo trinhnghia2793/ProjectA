@@ -25,6 +25,7 @@ class BaseRepository implements BaseRepositoryInterface
         array $extend = [],
         int $perPage = 1,
         array $relations = [],
+        array $orderBy = ['id', 'DESC'], // mặc định
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             // Tìm kiếm theo keyword
@@ -48,11 +49,18 @@ class BaseRepository implements BaseRepositoryInterface
         }
 
         // Join giữa các bảng
-        if(!empty($join)) {
-            $query->join(...$join);
+        if(isset($join) && is_array($join) && count($join)) {
+            foreach($join as $key => $val) {
+                $query->join($val[0], $val[1], $val[2], $val[3]);
+            }    
         }
 
-        // Trả về & phân trang
+        // Order by
+        if(isset($orderBy) && !empty($orderBy)) {
+            $query->orderBy($orderBy[0], $orderBy[1]);
+        }
+
+        // Bước cuối: Trả về & phân trang
         return $query->paginate($perPage)
                     ->withQueryString()
                     ->withPath(env('APP_URL').$extend['path']);

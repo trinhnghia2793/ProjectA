@@ -1,15 +1,12 @@
 <table class="table table-striped table-bordered">
     <thead>
         <tr>
-            <th>
+            <th style="width: 50px">
                 <input type="checkbox" value="" id="checkAll" class="input-checkbox">
             </th>
-            <th style="width: 100px;">Ảnh</th>
-            <th>Tên ngôn ngữ</th>
-            <th>Canonical</th>
-            <th>Mô tả</th>
-            <th class="text-center">Tình trạng</th>
-            <th class="text-center">Thao tác</th>
+            <th>Tên nhóm</th>
+            <th class="text-center" style="width: 100px">Tình trạng</th>
+            <th class="text-center" style="width: 100px">Thao tác</th>
         </tr>
     </thead>
     <tbody>
@@ -20,16 +17,8 @@
                         <input type="checkbox" value="{{ $postCatalogue->id }}" class="input-checkbox checkBoxItem">
                     </td>
                     <td>
-                        <span class="image img-cover"><img src="{{ $postCatalogue->image }}" alt=""></span>
-                    </td>
-                    <td>
-                        {{ $postCatalogue->name }}
-                    </td>
-                    <td>
-                        {{ $postCatalogue->canonical }}
-                    </td>
-                    <td>
-                        {{ $postCatalogue->description }}
+                        {{-- Với mỗi level > 0 sẽ cài thêm cái '|----' vào để phân cấp bậc --}}
+                        {{ str_repeat('|----', ( ($postCatalogue->level > 0) ? ($postCatalogue->level - 1) : 0 )) . $postCatalogue->name }}
                     </td>
                     <td class="text-center js-switch-{{ $postCatalogue->id }}"> 
                         <input type="checkbox" value="{{ $postCatalogue->publish }}" class="js-switch status" data-field="publish" data-model="PostCatalogue" {{ ($postCatalogue->publish == 2) ? 'checked' : '' }} data-modelId="{{ $postCatalogue->id }}" />

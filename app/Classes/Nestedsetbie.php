@@ -3,6 +3,7 @@ namespace App\Classes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
+// Class dùng để tính toán phân chia nhóm bài viết
 class Nestedsetbie{
 
 	function __construct($params = NULL){
