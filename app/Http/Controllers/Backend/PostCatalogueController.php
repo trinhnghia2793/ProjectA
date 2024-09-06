@@ -10,6 +10,7 @@ use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogu
 
 use App\Http\Requests\StorePostCatalogueRequest;
 use App\Http\Requests\UpdatePostCatalogueRequest;
+use App\Http\Requests\DeletePostCatalogueRequest;
 
 use App\Classes\Nestedsetbie;
 
@@ -121,7 +122,7 @@ class PostCatalogueController extends Controller
     // Delete
     public function delete($id) {
         $config['seo'] = config('apps.postcatalogue');
-        $postCatalogue = $this->postCatalogueRepository->findById($id);
+        $postCatalogue = $this->postCatalogueRepository->getPostCatalogueById($id, $this->language);
         $template = 'backend.post.catalogue.delete';
         return view('backend.dashboard.layout', compact(
             'template',
@@ -131,7 +132,7 @@ class PostCatalogueController extends Controller
     }
 
     // Destroy
-    public function destroy($id) {
+    public function destroy($id, DeletePostCatalogueRequest $request) {
         if($this->postCatalogueService->destroy($id)) {
             toastr()->success("Xóa bản ghi thành công.");
             return redirect()->route('post.catalogue.index');

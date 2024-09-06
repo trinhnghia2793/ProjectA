@@ -115,7 +115,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
                 // tạo lại bản ghi mới
                 $response = $this->postCatalogueRepository->createLanguagePivot($postCatalogue, $payloadLanguage);
 
-                 // Tính toán lại các giá trị left - right
+                // Tính toán lại các giá trị left - right
                 $this->nestedset->Get('level ASC', 'order ASC');
                 $this->nestedset->Recursive(0, $this->nestedset->Set());
                 $this->nestedset->Action();
@@ -137,6 +137,11 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         DB::beginTransaction();
         try {
             $postCatalogue = $this->postCatalogueRepository->delete($id);
+
+            // Tính toán lại các giá trị left - right
+            $this->nestedset->Get('level ASC', 'order ASC');
+            $this->nestedset->Recursive(0, $this->nestedset->Set());
+            $this->nestedset->Action();
 
             DB::commit();
             return true;
