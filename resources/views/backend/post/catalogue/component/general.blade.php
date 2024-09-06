@@ -28,7 +28,7 @@
                 placeholder="" 
                 autocomplete="off" 
                 id="description"
-                data-height="150"
+                data-height="100"
             >{{ old('description', ($postCatalogue->description) ?? '' ) }}</textarea>
         </div>
     </div>

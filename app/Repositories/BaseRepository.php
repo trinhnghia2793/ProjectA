@@ -26,6 +26,7 @@ class BaseRepository implements BaseRepositoryInterface
         int $perPage = 1,
         array $relations = [],
         array $orderBy = ['id', 'DESC'], // mặc định
+        array $where = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             // Tìm kiếm theo keyword
@@ -36,6 +37,13 @@ class BaseRepository implements BaseRepositoryInterface
             // Tìm kiếm theo tình trạng publish
             if(isset($condition['publish']) && $condition['publish'] != 0) {
                 $query->where('publish', '=', $condition['publish']);
+            }
+
+            // phần where mở rộng (dùng cho những thứ khác)
+            if(isset($condition['where']) && count($condition['where'])) {
+                foreach($condition['where'] as $key => $val) {
+                    $query->where($val[0], $val[1], $val[2]);
+                }
             }
 
             return $query;
@@ -107,7 +115,8 @@ class BaseRepository implements BaseRepositoryInterface
         return $this->model->select($column)->with($relation)->findOrFail($modelId);
     }
 
-    // Translate: làm cái gì đó
+    // attach: thêm một bản ghi vào bảng pivot (bảng pivot là bảng sinh ra từ mối quan hệ n-n)
+    // detach: ngược lại
     public function createLanguagePivot($model, array $payload = []) {
         return $model->languages()->attach($model->id, $payload);
     }

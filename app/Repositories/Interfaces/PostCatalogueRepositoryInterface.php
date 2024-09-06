@@ -19,4 +19,6 @@ interface PostCatalogueRepositoryInterface
     public function forceDelete(int $id = 0);
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []);
     public function createLanguagePivot($model, array $payload = []);
+
+    public function getPostCatalogueById(int $id = 0, $language_id = 0);
 }

@@ -4,9 +4,44 @@
     </div>
     <div class="ibox-content">
         <div class="seo-container">
-            <div class="meta-title">{{ (old('meta_title')) ?? 'Bạn chưa có tiêu đề SEO' }}</div>
-            <div class="canonical">{{ (old('canonical')) ? config('app.url') . '/' . old('canonical') . config('apps.general.suffix') : 'https://duong-dan-cua-ban.html' }}</div>
-            <div class="meta-description">{{ (old('meta_description')) ?? 'Bạn chưa có mô tả SEO' }}</div>
+
+            {{--
+                (1) Kiểm tra giá trị old('meta-title') từ lần submit trước, có thì sẽ hiển thị
+                (2) Nếu rỗng, kiểm tra nếu tồn tại $postCatalouge->meta_title thì sẽ hiển thị (edit form)
+                Nếu 1 trong 2 cái khác rỗng thì sẽ được in ra
+                Nếu cả hai đều rỗng thì in ra 'Bạn chưa có tiêu đề SEO'
+            --}}
+            <div class="meta-title"> 
+                {{ 
+                    (old('meta_title', ($postCatalogue->meta_title) ?? '')) 
+                    ?? 'Bạn chưa có tiêu đề SEO' 
+                }}
+            </div>
+
+            {{-- Có thêm dấu '/' là do dùng 127.0.0.1 --}}
+            {{-- 
+                (1) Nếu như có giá trị từ old (lần submit trước đó) thì sẽ được hiển thị
+                (2) Nếu rỗng, kiểm tra nếu tồn tại $postCatalogue->canonical thì sẽ hiển thị (edit form)
+                Nếu 1 trong 2 cái trên khác rỗng thì sẽ in ra theo định dạng
+                Nếu cả hai cái trên rỗng thì sẽ in ra https://duong-dan-cua-ban.html
+                (old(1, 2 ?? '')) ? [1 hoặc 2] : default
+            --}}
+            <div class="canonical"> 
+                {{ 
+                    (old('canonical', ($postCatalogue->canonical) ?? '')) 
+                    ? config('app.url') . '/' . old('canonical', ($postCatalogue->canonical) ?? '') . config('apps.general.suffix') 
+                    : 'https://duong-dan-cua-ban.html' 
+                }} 
+            </div>
+
+            {{-- Giống meta-title --}}
+            <div class="meta-description">
+                {{ 
+                    (old('meta_description', ($postCatalogue->meta_description) ?? '')) 
+                    ?? 'Bạn chưa có mô tả SEO' 
+                }}
+            </div>
+
         </div>
         <div class="seo-wrapper">
 

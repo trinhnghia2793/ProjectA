@@ -21,16 +21,18 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
 {
     protected $postCatalogueRepository;
     protected $nestedset;
+    protected $language;
 
     public function __construct(
         PostCatalogueRepository $postCatalogueRepository,
     )
     {
+        $this->language = $this->currentLanguage();
         $this->postCatalogueRepository = $postCatalogueRepository;
         $this->nestedset = new Nestedsetbie([
             'table' => 'post_catalogues',
             'foreign_key' => 'post_catalogue_id',
-            'language_id' => $this->currentLanguage(),
+            'language_id' => $this->language,
         ]);
     }   
 
@@ -39,6 +41,9 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
 
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
+        $condition['where'] = [
+            ['tb2.language_id', '=', $this->language]
+        ];
         $perPage = $request->integer('perpage');
         $postCatalogues = $this->postCatalogueRepository->pagination(
             $this->paginateSelect(), 
@@ -71,6 +76,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
                 $payloadLanguage['language_id'] = $this->currentLanguage();
                 $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
 
+                // Tạo một bản ghi mới
                 $language = $this->postCatalogueRepository->createLanguagePivot($postCatalogue, $payloadLanguage);
             }
 
@@ -90,12 +96,31 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         }
     }
 
-    // Update thông tin
+    // Update thông tin (nghe đâu là xóa đi bản cũ xong insert mới lại?????)
     public function update($id, $request) {
         DB::beginTransaction();
         try {
+            // Tìm postCatalogue
+            $postCatalogue = $this->postCatalogueRepository->findById($id);
+
             $payload = $request->except(['_token', 'send']);
-            $postCatalogue = $this->postCatalogueRepository->update($id, $payload);
+            $flag = $this->postCatalogueRepository->update($id, $payload);
+            if($flag == TRUE) { // Nếu update thành công vào bảng thì bắt lại
+                $payloadLanguage = $request->only($this->payloadLanguage());
+                $payloadLanguage['language_id'] = $this->currentLanguage();
+                $payloadLanguage['post_catalogue_id'] = $id;
+
+                // detach: xóa một bản ghi khỏi bảng pivot
+                $postCatalogue->languages()->detach([$payloadLanguage['language_id'], $id]);
+                // tạo lại bản ghi mới
+                $response = $this->postCatalogueRepository->createLanguagePivot($postCatalogue, $payloadLanguage);
+
+                 // Tính toán lại các giá trị left - right
+                $this->nestedset->Get('level ASC', 'order ASC');
+                $this->nestedset->Recursive(0, $this->nestedset->Set());
+                $this->nestedset->Action();
+            }
+
             DB::commit();
             return true;
         }
