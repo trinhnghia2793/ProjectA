@@ -10,11 +10,14 @@
     </div>
 
     <div class="ibox-content">
+        @php
+            $gallery = ( isset($album) && count($album) ) ? $album : old('album');
+        @endphp
         <div class="row">
             <div class="col-lg-12">
 
                 {{-- Nếu chưa có biến album hoặc album rỗng thì show nút chọn ảnh --}}
-                @if(!isset($album) || count($album) == 0)
+                @if(!isset($gallery) || count($gallery) == 0)
                 <div class="click-to-upload">
                     <div class="icon">
                         <a href="" class="upload-picture">
@@ -27,24 +30,25 @@
                 </div>
                 @endif
 
-                {{-- Nếu đã có biến album và trong album có hình ảnh thì show ra --}}
-                @if(isset($album) && count($album))
-                <div class="upload-list {{ (count($album)) ? '' : hidden }}">
+                <div class="upload-list {{ (isset($gallery) && count($gallery)) ? '' : 'hidden' }}">
                     <ul id="sortable" class="clearfix data-album sortui ui-sortable">
-                        @foreach ($album as $key => $val)
-                        <li class="ui-state-default">
-                            <div class="thumb">
-                                <span class="span image img-scaledown">
-                                    <img src="{{ $val }}" alt="{{ $val }}">
-                                    <input type="hidden" name="album[]" value="{{ $val }}">
-                                </span>
-                                <button class="delete-image"><i class="fa fa-trash"></i></button>
-                            </div>
-                        </li>
-                        @endforeach
+
+                        @if(isset($gallery) && count($gallery))
+                            @foreach ($gallery as $key => $val)
+                                <li class="ui-state-default">
+                                    <div class="thumb">
+                                        <span class="span image img-scaledown">
+                                            <img src="{{ $val }}" alt="{{ $val }}">
+                                            <input type="hidden" name="album[]" value="{{ $val }}">
+                                        </span>
+                                        <button class="delete-image"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                </li>
+                            @endforeach
+                        @endif
+
                     </ul>
                 </div>
-                @endif
 
             </div>
         </div>

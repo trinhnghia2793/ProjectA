@@ -5,6 +5,7 @@ use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\UserController;
 use App\Http\Controllers\Backend\UserCatalogueController;
 use App\Http\Controllers\Backend\PostCatalogueController;
+use App\Http\Controllers\Backend\PostController;
 use App\Http\Controllers\Backend\LanguageController;
 
 use App\Http\Controllers\Ajax\LocationController;
@@ -23,7 +24,7 @@ Route::get('/admin', [AuthController::class, 'index'])->name('auth.admin')->midd
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login')->middleware('login');
 Route::get('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
-// trang dashboard
+// Trang dashboard
 Route::get('dashboard/index', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('admin');
 
 // USER
@@ -71,7 +72,7 @@ Route::group(['prefix' => 'language'], function() {
 
 });
 
-// USER CATALOGUE
+// POST CATALOGUE
 Route::group(['prefix' => 'post/catalogue'], function() {
     Route::get('index', [PostCatalogueController::class, 'index'])->name('post.catalogue.index')->middleware('admin');
 
@@ -83,6 +84,21 @@ Route::group(['prefix' => 'post/catalogue'], function() {
 
     Route::get('{id}/delete', [PostCatalogueController::class, 'delete'])->where(['id' => '[0-9]+'])->name('post.catalogue.delete')->middleware('admin');
     Route::delete('{id}/destroy', [PostCatalogueController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('post.catalogue.destroy')->middleware('admin');
+
+});
+
+// POST 
+Route::group(['prefix' => 'post'], function() {
+    Route::get('index', [PostController::class, 'index'])->name('post.index')->middleware('admin');
+
+    Route::get('create', [PostController::class, 'create'])->name('post.create')->middleware('admin');
+    Route::post('store', [PostController::class, 'store'])->name('post.store')->middleware('admin');
+
+    Route::get('{id}/edit', [PostController::class, 'edit'])->where(['id' => '[0-9]+'])->name('post.edit')->middleware('admin');
+    Route::post('{id}/update', [PostController::class, 'update'])->where(['id' => '[0-9]+'])->name('post.update')->middleware('admin');
+
+    Route::get('{id}/delete', [PostController::class, 'delete'])->where(['id' => '[0-9]+'])->name('post.delete')->middleware('admin');
+    Route::delete('{id}/destroy', [PostController::class, 'destroy'])->where(['id' => '[0-9]+'])->name('post.destroy')->middleware('admin');
 
 });
 

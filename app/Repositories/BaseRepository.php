@@ -116,7 +116,8 @@ class BaseRepository implements BaseRepositoryInterface
 
     // attach: thêm một bản ghi vào bảng pivot (bảng pivot là bảng sinh ra từ mối quan hệ n-n)
     // detach: ngược lại
-    public function createLanguagePivot($model, array $payload = []) {
-        return $model->languages()->attach($model->id, $payload);
+    // Thêm bảng Pivot (cái này có thời gian ngồi nghiên cứu sau)
+    public function createPivot($model, array $payload = [], string $relation = '') {
+        return $model->{$relation}()->attach($model->id, $payload);
     }
 }

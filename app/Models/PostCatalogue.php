@@ -42,11 +42,17 @@ class PostCatalogue extends Model
         )->withTimestamps();
     }
 
+    // Mối quan hệ với bảng posts
+    public function posts(){
+        return $this->belongsToMany(Post::class, 'post_catalogue_post' , 'post_catalogue_id', 'post_id');
+    }
+
     // Mối quan hệ với bảng postCatalogueLanguage
     public function post_catalogue_language() {
         return $this->hasMany(PostCatalogueLanguage::class, 'post_catalogue_id', 'id');
     }
 
+    // Hàm kiểm tra node
     public static function isNodeCheck($id = 0) {
         $postCatalogue = PostCatalogue::find($id);
 

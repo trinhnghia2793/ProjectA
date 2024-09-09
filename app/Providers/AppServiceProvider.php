@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
         // Post catalogue
         'App\Services\Interfaces\PostCatalogueServiceInterface' => 'App\Services\PostCatalogueService',
         'App\Repositories\Interfaces\PostCatalogueRepositoryInterface' => 'App\Repositories\PostCatalogueRepository',
+
+        // Post
+        'App\Services\Interfaces\PostServiceInterface' => 'App\Services\PostService',
+        'App\Repositories\Interfaces\PostRepositoryInterface' => 'App\Repositories\PostRepository',
        
         // Province, district
         'App\Repositories\Interfaces\ProvinceRepositoryInterface' => 'App\Repositories\ProvinceRepository',
