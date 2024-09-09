@@ -33,9 +33,10 @@ class LanguageService implements LanguageServiceInterface
         $condition['publish'] = $request->integer('publish');
         $perPage = $request->integer('perpage');
         $languages = $this->LanguageRepository->pagination(
-            $this->paginateSelect(), $condition, [], ['path' => '/language/index'], 
+            $this->paginateSelect(), 
+            $condition, 
             $perPage,
-            [], // relation
+            ['path' => '/language/index'], 
         );
         return $languages;
     }

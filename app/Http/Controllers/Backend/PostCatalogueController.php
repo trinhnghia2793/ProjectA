@@ -100,12 +100,15 @@ class PostCatalogueController extends Controller
 
         $dropdown = $this->nestedset->Dropdown();
 
+        $album = json_decode($postCatalogue->album);
+
         $template = 'backend.post.catalogue.store';
         return view('backend.dashboard.layout', compact(
             'template',
             'config',
             'dropdown',
             'postCatalogue',
+            'album'
         ));
     }
 

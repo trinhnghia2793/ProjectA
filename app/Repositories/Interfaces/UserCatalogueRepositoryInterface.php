@@ -8,9 +8,11 @@ interface UserCatalogueRepositoryInterface
     public function pagination(
         array $column = ['*'], 
         array $condition = [], 
-        array $join = [],
-        array $extend = [],
         int $perPage = 1,
+        array $extend = [],
+        array $orderBy = ['id', 'DESC'], // mặc định
+        array $join = [],
+        array $relations = [],
     );
     public function findById(int $id);
     public function create(array $payload = []);

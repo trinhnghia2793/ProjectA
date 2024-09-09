@@ -21,12 +21,11 @@ class BaseRepository implements BaseRepositoryInterface
     public function pagination(
         array $column = ['*'], 
         array $condition = [], 
-        array $join = [],
-        array $extend = [],
         int $perPage = 1,
-        array $relations = [],
+        array $extend = [],
         array $orderBy = ['id', 'DESC'], // mặc định
-        array $where = [],
+        array $join = [],
+        array $relations = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             // Tìm kiếm theo keyword

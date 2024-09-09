@@ -19,6 +19,12 @@
         }  
     }
 
+    //
+    HT.sortui = () => {
+        $( "#sortable" ).sortable();
+        $( "#sortable" ).disableSelection();
+    }
+
     // Hàm chuyển đổi trạng thái của publish khi bật tắt switchery
     HT.changeStatus = () => {
         if($('.status').length) {
@@ -159,6 +165,7 @@
         HT.checkBoxItem();
         HT.allChecked();
         HT.changeStatusAll();
+        HT.sortui();
     })
 
 })(jQuery);

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Classes\Nestedsetbie;
+use Illuminate\Support\Str;
 
 /**
  * Class PostCatalogueService
@@ -44,19 +45,19 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         $condition['where'] = [
             ['tb2.language_id', '=', $this->language]
         ];
+
         $perPage = $request->integer('perpage');
+
         $postCatalogues = $this->postCatalogueRepository->pagination(
             $this->paginateSelect(), 
             $condition, 
+            $perPage,
+            ['path' => 'post.catalogue.index'],
+            ['post_catalogues.lft', 'ASC'], // order by
             [
                 ['post_catalogue_language as tb2', 'tb2.post_catalogue_id', '=' , 'post_catalogues.id'] // val[0], val[1], val[2], val[3] bên base repository
-            ], 
-            ['path' => 'post.catalogue.index'], 
-            $perPage,
-            [], // relation
-            [
-                'post_catalogues.lft', 'ASC'
-            ] // order by
+            ],           
+            // [], // relations
         );
 
         return $postCatalogues;
@@ -68,11 +69,14 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         try {
             $payload = $request->only($this->payload());
             $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
+            $payload['album'] = json_encode($payload['album']);
             $postCatalogue = $this->postCatalogueRepository->create($payload);
 
-            // Nếu create ở trên thành công (tức có dòng thêm vào) sẽ tiến hành thêm ở bảng language
+            // Nếu create ở trên thành công (tức có dòng thêm vào : > 0) sẽ tiến hành thêm ở bảng language
             if($postCatalogue->id > 0) {
                 $payloadLanguage = $request->only($this->payloadLanguage());
+                $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
+                
                 $payloadLanguage['language_id'] = $this->currentLanguage();
                 $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
 
@@ -104,6 +108,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
             $postCatalogue = $this->postCatalogueRepository->findById($id);
 
             $payload = $request->except(['_token', 'send']);
+            $payload['album'] = json_encode($payload['album']);
             $flag = $this->postCatalogueRepository->update($id, $payload);
             if($flag == TRUE) { // Nếu update thành công vào bảng thì bắt lại
                 $payloadLanguage = $request->only($this->payloadLanguage());
@@ -194,31 +199,6 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         }
     }
 
-    // Cập nhật tình trạng của tất cả User khi cập nhật tình trạng của PostCatalogue
-    // private function changeUserStatus($post, $value) {
-    //     DB::beginTransaction();
-    //     try {
-    //         $array = [];
-    //         if(isset($post['modelId'])) {
-    //             $array[] = $post['modelId'];
-    //         }
-    //         else {
-    //             $array = $post['id'];
-    //         }    
-    //         $payload[$post['field']] = $value;
-    //         $this->userRepository->updateByWhereIn('user_catalogue_id', $array, $payload);
-
-    //         DB::commit();
-    //         return true;
-    //     }
-    //     catch(\Exception $e) {
-    //         DB::rollback();
-    //         echo $e->getMessage();
-    //         die();
-    //         return false;
-    //     }
-    // }
-
     // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {
         return [
@@ -238,7 +218,8 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
             'parent_id', 
             'follow', 
             'publish', 
-            'image'
+            'image',
+            'album',
         ]; 
     }
 

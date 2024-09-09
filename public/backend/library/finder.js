@@ -83,12 +83,31 @@
         })
     }
 
-    // Hàm upload ảnh avatar
+    // Hàm upload ảnh avatar (khi click vào thực hiện mở popup để chọn avatar)
     HT.uploadImageAvatar = () => {
         $('.image-target').click(function() {
             let input = $(this)
             let type = 'Images'
             HT.browseServerAvatar(input, type)
+        })
+    }
+
+    // Upload nhiều hình ảnh
+    HT.multipleUploadImageCkeditor = () => {
+        $(document).on('click', '.multipleUploadImageCkeditor', function(e) {
+            let object = $(this)
+            let target = object.attr('data-target') // cái này lấy tên của id để truyền ảnh vào á
+            HT.browseServerCkeditor(object, 'Images', target);
+
+            e.preventDefault()
+        })
+    }
+
+    // Hàm upload ảnh vào album
+    HT.uploadAlbum = () => {
+        $(document).on('click', '.upload-picture', function(e) {
+            HT.browseServerAlbum();
+            e.preventDefault();
         })
     }
 
@@ -105,7 +124,7 @@
         finder.popup();
     }
 
-    // Hàm duyệt ảnh để lấy avatar
+    // Hàm mở popup duyệt ảnh để lấy avatar
     HT.browseServerAvatar = (object, type) => {
         if(typeof(type) == 'undefined') {
             type = 'Images';
@@ -119,11 +138,81 @@
         finder.popup();
     }
 
+    // Hàm mở popup thực hiện multipleUpload
+    HT.browseServerCkeditor = (object, type, target) => {
+
+        if(typeof(type) == 'undefined') {
+            type = 'Images';
+        }
+        var finder = new CKFinder();
+        finder.resourceType = type;
+        finder.selectActionFunction = function( fileUrl, data, allFiles ) {
+            var html = '';
+            for(var i = 0; i < allFiles.length; i++) {
+                var image = allFiles[i].url
+                html += '<div class="image-content"><figure>'
+                    html += '<img src="'+image+'" alt="'+image+'">'
+                    html += '<figcaption>Nhập vào mô tả cho ảnh</figcaption>'
+                html += '</figure></div>';
+
+            }
+            
+            CKEDITOR.instances[target].insertHtml(html)
+        }
+        finder.popup();
+    }
+    
+    // Hàm mở popup thêm ảnh vào album
+    HT.browseServerAlbum = () => {
+        var type = 'Images';
+        var finder = new CKFinder();
+        finder.resourceType = type;
+        finder.selectActionFunction = function( fileUrl, data, allFiles ) {
+            var html = '';
+            for(var i = 0; i < allFiles.length; i++) {
+                var image = allFiles[i].url
+                
+                html += '<li class="ui-state-default">'
+                    html += '<div class="thumb">'
+                        html += '<span class="span image img-scaledown">'
+                            html += '<img src="'+image+'" alt="'+image+'">'
+                            html += '<input type="hidden" name="album[]" value="'+image+'">'
+                        html += '</span>'
+                        html += '<button class="delete-image"><i class="fa fa-trash"></i></button>'
+                    html += '</div>'
+                html += '</li>'
+
+            }
+         
+            $('.click-to-upload').addClass('hidden')
+            $('#sortable').append(html)
+            $('.upload-list').removeClass('hidden')
+            
+        }
+        finder.popup();
+    }
+
+    // Xóa hình đã chọn trước đó
+    HT.deletePicture = () => {
+        $(document).on('click', '.delete-image', function() {
+            let _this = $(this)
+            _this.parents('.ui-state-default').remove()
+            // Kiểm tra nếu xóa tất cả hình trong album thì cho hiện cái kia lên lại
+            if($('.ui-state-default').length == 0) {
+                $('.click-to-upload').removeClass('hidden')
+                $('.upload-list').addClass('hidden')
+            }
+        })
+    }
+
     // Gọi hàm để chạy
     $(document).ready(function() {
         HT.uploadImageToInput();
         HT.setupCkeditor();
         HT.uploadImageAvatar();
+        HT.multipleUploadImageCkeditor();
+        HT.uploadAlbum();
+        HT.deletePicture();
     })
 
 })(jQuery);
