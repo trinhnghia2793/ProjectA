@@ -81,7 +81,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
                 $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
 
                 // Tạo một bản ghi mới
-                $language = $this->postCatalogueRepository->createLanguagePivot($postCatalogue, $payloadLanguage);
+                $language = $this->postCatalogueRepository->createPivot($postCatalogue, $payloadLanguage, 'languages');
             }
 
             // Tính toán lại các giá trị left - right
@@ -118,7 +118,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
                 // detach: xóa một bản ghi khỏi bảng pivot
                 $postCatalogue->languages()->detach([$payloadLanguage['language_id'], $id]);
                 // tạo lại bản ghi mới
-                $response = $this->postCatalogueRepository->createLanguagePivot($postCatalogue, $payloadLanguage);
+                $response = $this->postCatalogueRepository->createPivot($postCatalogue, $payloadLanguage, 'languages');
 
                 // Tính toán lại các giá trị left - right
                 $this->nestedset->Get('level ASC', 'order ASC');

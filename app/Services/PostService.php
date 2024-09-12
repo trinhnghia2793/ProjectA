@@ -45,12 +45,12 @@ class PostService extends BaseService implements PostServiceInterface
             $this->paginateSelect(), 
             $condition, 
             $perPage,
-            ['path' => 'post.catalogue.index'],
+            ['path' => 'post.index'],
             ['posts.id', 'ASC'], // order by // cái post nào mới (id to nhất) thì đưa lên trước
             [
                 ['post_language as tb2', 'tb2.post_id', '=' , 'posts.id'] // val[0], val[1], val[2], val[3] bên base repository
             ],           
-            // [], // relations
+            ['post_catalogues'], // relations
         );
 
         return $posts;
@@ -62,13 +62,14 @@ class PostService extends BaseService implements PostServiceInterface
         try {
             $payload = $request->only($this->payload());
             $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
-            $payload['album'] = json_encode($payload['album']);
+            $payload['album'] = (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
 
             $post = $this->postRepository->create($payload);
 
             // Nếu create ở trên thành công (tức có dòng thêm vào : > 0) sẽ tiến hành thêm ở bảng language
             if($post->id > 0) {
                 $payloadLanguage = $request->only($this->payloadLanguage());
+
                 $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
                 $payloadLanguage['language_id'] = $this->currentLanguage();
                 $payloadLanguage['post_id'] = $post->id;
@@ -99,19 +100,25 @@ class PostService extends BaseService implements PostServiceInterface
         try {
             // Tìm postCatalogue
             $post = $this->postRepository->findById($id);
+            $payload = $request->only($this->payload());
+            $payload['album'] = (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
 
-            $payload = $request->except(['_token', 'send']);
-            $payload['album'] = json_encode($payload['album']);
             $flag = $this->postRepository->update($id, $payload);
             if($flag == TRUE) { // Nếu update thành công vào bảng thì bắt lại
                 $payloadLanguage = $request->only($this->payloadLanguage());
+
+                $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
                 $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['post_catalogue_id'] = $id;
+                $payloadLanguage['post_id'] = $post->id;
 
                 // detach: xóa một bản ghi khỏi bảng pivot
                 $post->languages()->detach([$payloadLanguage['language_id'], $id]);
                 // tạo lại bản ghi mới
-                $response = $this->postRepository->createLanguagePivot($post, $payloadLanguage);
+                $response = $this->postRepository->createPivot($post, $payloadLanguage, 'languages');
+
+                // Insert vào bảng pivot (chắc thế)
+                $catalogue = $this->catalogue($request);
+                $post->post_catalogues()->sync($catalogue);
             }
 
             DB::commit();
@@ -146,8 +153,6 @@ class PostService extends BaseService implements PostServiceInterface
             return false;
         }
     }
-
-    // chưa sửa lại cái createpivot của postCataalogue
 
     // Bắt postCataloguePost (bắt mối quan hệ)
     private function catalogue($request){
@@ -209,7 +214,6 @@ class PostService extends BaseService implements PostServiceInterface
             'posts.id', 
             'posts.publish', 
             'posts.image', 
-            'posts.level', 
             'posts.order', 
             'tb2.name', 
             'tb2.canonical',

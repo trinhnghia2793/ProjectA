@@ -21,7 +21,7 @@
                         {{ str_repeat('|----', ( ($postCatalogue->level > 0) ? ($postCatalogue->level - 1) : 0 )) . $postCatalogue->name }}
                     </td>
                     <td class="text-center js-switch-{{ $postCatalogue->id }}"> 
-                        <input type="checkbox" value="{{ $postCatalogue->publish }}" class="js-switch status" data-field="publish" data-model="PostCatalogue" {{ ($postCatalogue->publish == 2) ? 'checked' : '' }} data-modelId="{{ $postCatalogue->id }}" />
+                        <input type="checkbox" value="{{ $postCatalogue->publish }}" class="js-switch status" data-field="publish" data-model="{{ $config['model'] }}" {{ ($postCatalogue->publish == 2) ? 'checked' : '' }} data-modelId="{{ $postCatalogue->id }}" />
                     </td>
                     <td class="text-center"> 
                         <a href="{{ route('post.catalogue.edit', $postCatalogue->id) }}" class="btn btn-success"><i class="fa fa-edit"></i></a>
