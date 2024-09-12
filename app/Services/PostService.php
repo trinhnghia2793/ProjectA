@@ -100,25 +100,10 @@ class PostService extends BaseService implements PostServiceInterface
         try {
             // Tìm postCatalogue
             $post = $this->postRepository->findById($id);
-            $payload = $request->only($this->payload());
-            $payload['album'] = (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
-
-            $flag = $this->postRepository->update($id, $payload);
-            if($flag == TRUE) { // Nếu update thành công vào bảng thì bắt lại
-                $payloadLanguage = $request->only($this->payloadLanguage());
-
-                $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
-                $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['post_id'] = $post->id;
-
-                // detach: xóa một bản ghi khỏi bảng pivot
-                $post->languages()->detach([$payloadLanguage['language_id'], $id]);
-                // tạo lại bản ghi mới
-                $response = $this->postRepository->createPivot($post, $payloadLanguage, 'languages');
-
-                // Insert vào bảng pivot (chắc thế)
-                $catalogue = $this->catalogue($request);
-                $post->post_catalogues()->sync($catalogue);
+            // Nếu update thành công vào bảng thì bắt lại
+            if($this->uploadPost($post, $request) == TRUE) { 
+                $this->uploadLanguageForPost($post, $request);
+                $this->updateCatalogueForPost($post, $request);
             }
 
             DB::commit();
@@ -154,19 +139,53 @@ class PostService extends BaseService implements PostServiceInterface
         }
     }
 
+    // Tiến hành upload post
+    private function uploadPost($id, $request) {
+        $payload = $request->only($this->payload());
+        $payload['album'] = $this->formatAlbum($payload['album']);
+        return $this->postRepository->update($id, $payload);
+    }
+
+    // Format Album
+    private function formatAlbum() {
+        return (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
+    }
+
+    // Upload language cho post
+    private function updateForPost($post, $request) {
+        $payload = $request->only($this->payloadLanguage());
+        $payload = $this->formatLanguagePayload($payload, $post->id);
+        // detach: xóa một bản ghi khỏi bảng pivot
+        $post->languages()->detach([$this->language, $post->id]);
+        // tạo lại bản ghi mới
+        return $response = $this->postRepository->createPivot($post, $payloadLanguage, 'languages');
+    }
+
+    // Format Language
+    private function formatLanguagePayload($payload, $postId) {
+        $payload['canonical'] = Str::slug($payload['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
+        $payload['language_id'] = $this->currentLanguage();
+        $payload['post_id'] = $postId;
+        return $payload;
+    }
+
+    // Update Catalogue cho bảng Post
+    private function updateCatalogueForPost($post, $request) {
+        // Insert vào bảng pivot
+        $post->post_catalogues()->sync($this->catalogue($request));
+    }
+
     // Bắt postCataloguePost (bắt mối quan hệ)
     private function catalogue($request){
-        if($request->input('catalogue') != null){
-            return array_unique(array_merge($request->input('catalogue'), [$request->post_catalogue_id]));
-        }
-        return [$request->post_catalogue_id];
+        return array_unique(array_merge($request->input('catalogue'), [$request->post_catalogue_id]));
     }
-    
-    // private function catalogue($request) {
-    //     return array_unique($request->input('catalogue'), [$request->post_catalogue_id]); 
+
+    // private function catalogue($request){
+    //     if($request->input('catalogue') != null){
+    //         return array_unique(array_merge($request->input('catalogue'), [$request->post_catalogue_id]));
+    //     }
+    //     return [$request->post_catalogue_id];
     // }
-
-
 
     // Cập nhật tình trạng của 1 bản ghi (switch)
     public function updateStatus($post = []) {
