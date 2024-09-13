@@ -26,7 +26,8 @@ trait QueryScopes
 
     // Scope Custom Where: Phần where mở rộng dùng cho những thứ khác
     public function scopeCustomWhere($query, $where = []) {
-        if(count($where)) {
+        // chỗ này mình tự sửa từ count thành empty
+        if(!empty($where)) {
             foreach($where as $key => $val) {
                 $query->where($val[0], $val[1], $val[2]);
             }

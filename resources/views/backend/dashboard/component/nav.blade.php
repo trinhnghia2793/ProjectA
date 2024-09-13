@@ -10,7 +10,12 @@
         </div>
         <ul class="nav navbar-top-links navbar-right">
             <li>
-                <span class="m-r-sm text-muted welcome-message">Welcome to INSPINIA+ Admin Theme.</span>
+                {{-- Chuyển đổi ngôn ngữ --}}
+                <div class="uk-flex uk-flex-middle">
+                    @foreach ($language as $key => $val)
+                    <a href="" class="image img-cover language-item"><img src="{{ $val->image }}" alt=""></a>
+                    @endforeach
+                </div>
             </li>
             <li class="dropdown">
                 <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">

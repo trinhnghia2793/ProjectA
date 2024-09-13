@@ -351,3 +351,11 @@ input[name=canonical] {
     color: #333;
     margin-right: 10px;
 }
+
+.language-item {
+    height: 60px;
+    padding: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 10px;
+}
