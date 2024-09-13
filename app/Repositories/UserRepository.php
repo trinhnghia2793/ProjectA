@@ -26,6 +26,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         array $orderBy = ['id', 'DESC'], // mặc định
         array $join = [],
         array $relations = [],
+        array $rawQuery = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             if(isset($condition['keyword']) && !empty($condition['keyword'])) {

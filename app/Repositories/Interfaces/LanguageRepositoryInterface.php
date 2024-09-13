@@ -13,6 +13,7 @@ interface LanguageRepositoryInterface
         array $orderBy = ['id', 'DESC'], // mặc định
         array $join = [],
         array $relations = [],
+        array $rawQuery = [],
     );
     public function findById(int $id);
     public function create(array $payload = []);

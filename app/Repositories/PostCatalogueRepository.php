@@ -26,6 +26,7 @@ class PostCatalogueRepository extends BaseRepository implements PostCatalogueRep
         array $orderBy = ['id', 'DESC'], // mặc định
         array $join = [],
         array $relations = [],
+        array $rawQuery = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             // Tìm kiếm theo keyword

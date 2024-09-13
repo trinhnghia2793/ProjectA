@@ -13,6 +13,7 @@ interface BaseRepositoryInterface
         array $orderBy = ['id', 'DESC'], // mặc định
         array $join = [],
         array $relations = [],
+        array $rawQuery = [],
     );
     public function all();
     public function findById(int $id);

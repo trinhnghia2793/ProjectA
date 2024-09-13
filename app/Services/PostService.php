@@ -30,13 +30,17 @@ class PostService extends BaseService implements PostServiceInterface
         $this->postRepository = $postRepository;
     }   
 
-    // Phân trang
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CRUD
+
+    // Phân trang (View)
     public function paginate($request) {
 
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
+        $condition['post_catalogue_id'] = $request->input('post_catalogue_id');
         $condition['where'] = [
-            ['tb2.language_id', '=', $this->language]
+            ['tb2.language_id', '=', $this->language],
         ];
 
         $perPage = $request->integer('perpage');
@@ -45,44 +49,33 @@ class PostService extends BaseService implements PostServiceInterface
             $this->paginateSelect(), 
             $condition, 
             $perPage,
-            ['path' => 'post.index'],
-            ['posts.id', 'ASC'], // order by // cái post nào mới (id to nhất) thì đưa lên trước
             [
-                ['post_language as tb2', 'tb2.post_id', '=' , 'posts.id'] // val[0], val[1], val[2], val[3] bên base repository
-            ],           
+                'path' => 'post.index', 
+                'groupBy' => $this->paginateSelect(),
+            ],
+            ['posts.id', 'DESC'], // order by // cái post nào mới (id to nhất) thì đưa lên trước
+            [
+                ['post_language as tb2', 'tb2.post_id', '=' , 'posts.id'], // val[0], val[1], val[2], val[3]
+                ['post_catalogue_post as tb3', 'posts.id', '=', 'tb3.post_id'],
+            ], //joins
             ['post_catalogues'], // relations
+            $this->whereRaw($request),
         );
-
         return $posts;
     }
 
-    // Tạo một Post
+    // Create Post
     public function create(Request $request) {
         DB::beginTransaction();
         try {
-            $payload = $request->only($this->payload());
-            $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
-            $payload['album'] = (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
-
-            $post = $this->postRepository->create($payload);
-
-            // Nếu create ở trên thành công (tức có dòng thêm vào : > 0) sẽ tiến hành thêm ở bảng language
+            // Tạo Post
+            $post = $this->createPost($request);
+            // Nếu create ở trên thành công (tức có dòng thêm vào : > 0)
             if($post->id > 0) {
-                $payloadLanguage = $request->only($this->payloadLanguage());
-
-                $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
-                $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['post_id'] = $post->id;
-
-                // Tạo một bản ghi mới
-                $language = $this->postRepository->createPivot($post, $payloadLanguage, 'languages');
-
-                // Insert vào bảng pivot (chắc thế)
-                $catalogue = $this->catalogue($request);
-                $post->post_catalogues()->sync($catalogue);
-                
+                // Update Language và Catalogue
+                $this->updateLanguageForPost($post, $request);
+                $this->updateCatalogueForPost($post, $request);               
             }
-
             DB::commit();
             return true;
         }
@@ -102,10 +95,9 @@ class PostService extends BaseService implements PostServiceInterface
             $post = $this->postRepository->findById($id);
             // Nếu update thành công vào bảng thì bắt lại
             if($this->uploadPost($post, $request) == TRUE) { 
-                $this->uploadLanguageForPost($post, $request);
+                $this->updateLanguageForPost($post, $request);
                 $this->updateCatalogueForPost($post, $request);
             }
-
             DB::commit();
             return true;
         }
@@ -121,44 +113,27 @@ class PostService extends BaseService implements PostServiceInterface
     public function destroy($id) {
         DB::beginTransaction();
         try {
-            $post = $this->postRepository->delete($id);
-
-            // // Tính toán lại các giá trị left - right
-            // $this->nestedset->Get('level ASC', 'order ASC');
-            // $this->nestedset->Recursive(0, $this->nestedset->Set());
-            // $this->nestedset->Action();
+            $post = $this->postRepository->delete($id); // Soft delete
 
             DB::commit();
             return true;
         }
         catch(\Exception $e) {
             DB::rollback();
-            echo $e->getMessage();
-            die();
+            // Log::error($e->getMessage());
+            // echo $e->getMessage(); die();
             return false;
         }
     }
 
-    // Tiến hành upload post
-    private function uploadPost($id, $request) {
-        $payload = $request->only($this->payload());
-        $payload['album'] = $this->formatAlbum($payload['album']);
-        return $this->postRepository->update($id, $payload);
-    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTION CHO CREATE & UPDATE
 
     // Format Album
-    private function formatAlbum() {
-        return (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
-    }
-
-    // Upload language cho post
-    private function updateForPost($post, $request) {
-        $payload = $request->only($this->payloadLanguage());
-        $payload = $this->formatLanguagePayload($payload, $post->id);
-        // detach: xóa một bản ghi khỏi bảng pivot
-        $post->languages()->detach([$this->language, $post->id]);
-        // tạo lại bản ghi mới
-        return $response = $this->postRepository->createPivot($post, $payloadLanguage, 'languages');
+    private function formatAlbum($request) {
+        //return (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
+        //return (isset($album) && !empty($album)) ? json_encode($album) : '';
+        return ($request->input('album') && !empty($request->input('album'))) ? json_encode($request->input('album')) : '';
     }
 
     // Format Language
@@ -169,23 +144,54 @@ class PostService extends BaseService implements PostServiceInterface
         return $payload;
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTION CHO CREATE
+
+    // Create Post
+    private function createPost($request) {
+        $payload = $request->only($this->payload());
+        $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
+        $payload['album'] = $this->formatAlbum($request);
+
+        $post = $this->postRepository->create($payload);
+        return $post;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTION CHO UPDATE
+
+    // Tiến hành upload Post
+    private function uploadPost($post, $request) {
+        $payload = $request->only($this->payload());
+        $payload['album'] = $this->formatAlbum($request);
+        return $this->postRepository->update($post->id, $payload);
+    }
+
+    // Update language cho Post
+    private function updateLanguageForPost($post, $request) {
+        $payload = $request->only($this->payloadLanguage());
+        $payload = $this->formatLanguagePayload($payload, $post->id);
+        // detach: xóa một bản ghi khỏi bảng pivot
+        $post->languages()->detach([$this->language, $post->id]);
+        // tạo lại bản ghi mới
+        return $response = $this->postRepository->createPivot($post, $payload, 'languages');
+    }
+    
     // Update Catalogue cho bảng Post
     private function updateCatalogueForPost($post, $request) {
         // Insert vào bảng pivot
         $post->post_catalogues()->sync($this->catalogue($request));
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     // Bắt postCataloguePost (bắt mối quan hệ)
     private function catalogue($request){
-        return array_unique(array_merge($request->input('catalogue'), [$request->post_catalogue_id]));
+        if($request->input('catalogue') != null){
+            return array_unique(array_merge($request->input('catalogue'), [$request->post_catalogue_id]));
+        }
+        return [$request->post_catalogue_id];
     }
-
-    // private function catalogue($request){
-    //     if($request->input('catalogue') != null){
-    //         return array_unique(array_merge($request->input('catalogue'), [$request->post_catalogue_id]));
-    //     }
-    //     return [$request->post_catalogue_id];
-    // }
 
     // Cập nhật tình trạng của 1 bản ghi (switch)
     public function updateStatus($post = []) {
@@ -227,6 +233,25 @@ class PostService extends BaseService implements PostServiceInterface
         }
     }
 
+    // Viết hàm để thêm câu truy vấn chay: lấy các danh mục con trong một danh mục cha được chọn
+    private function whereRaw($request) {
+        $rawCondition = [];
+        if($request->integer('post_catalogue_id') > 0) {
+            $rawCondition['whereRaw'] = [
+                [
+                    'tb3.post_catalogue_id IN (
+                        SELECT id
+                        FROM post_catalogues
+                        WHERE lft >= (SELECT lft FROM post_catalogues as pc WHERE pc.id = ?)
+                        AND rgt <= (SELECT rgt FROM post_catalogues as pc WHERE pc.id = ?)
+                    )',
+                    [$request->integer('post_catalogue_id'), $request->integer('post_catalogue_id')]
+                ] // Gồm câu truy vấn và mảng tham số binding vào trong dấu "?"
+            ];
+        }
+        return $rawCondition;
+    }
+    
     // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {
         return [

@@ -10,7 +10,7 @@ use App\Repositories\Interfaces\PostRepositoryInterface as PostRepository;
 
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Http\Requests\DeletePostRequest;
+use App\Http\Requests\DeletePostRequest; // Không có cái này
 
 use App\Classes\Nestedsetbie;
 
@@ -57,9 +57,12 @@ class PostController extends Controller
         ];
         $config['seo'] = config('apps.post');
         $template = 'backend.post.post.index'; // tên của view
+        $dropdown = $this->nestedset->Dropdown();
+
         return view('backend.dashboard.layout', compact(
             'template',
             'config',
+            'dropdown',
             'posts',
         ));
 
@@ -136,7 +139,7 @@ class PostController extends Controller
     }
 
     // Destroy
-    public function destroy($id, DeletePostRequest $request) {
+    public function destroy($id) {
         if($this->postService->destroy($id)) {
             toastr()->success("Xóa bản ghi thành công.");
             return redirect()->route('post.index');

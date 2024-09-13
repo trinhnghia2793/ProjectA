@@ -36,6 +36,8 @@
                         @foreach($dropdown as $key => $val)
                         <option 
                             @if(is_array(old('catalogue', (isset($catalogue) && count($catalogue)) ? $catalogue : [])) 
+                            && isset($post->post_catalogue_id)
+                            && $key !== $post->post_catalogue_id
                             && in_array($key, old('catalogue', (isset($catalogue)) ? $catalogue : [])) )
                             selected
                             @endif value="{{ $key }}">{{ $val }}</option>

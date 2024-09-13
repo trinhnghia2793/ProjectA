@@ -26,6 +26,7 @@ class BaseRepository implements BaseRepositoryInterface
         array $orderBy = ['id', 'DESC'], // mặc định
         array $join = [],
         array $relations = [],
+        array $rawQuery = [],
     ) {
         $query = $this->model->select($column)->where(function($query) use ($condition) {
             // Tìm kiếm theo keyword
@@ -44,14 +45,21 @@ class BaseRepository implements BaseRepositoryInterface
                     $query->where($val[0], $val[1], $val[2]);
                 }
             }
-
             return $query;
         });
+
+        // Raw Query: thêm vào từng câu truy vấn chay bắt được từ bên service
+        if(isset($rawQuery['whereRaw']) && count($rawQuery['whereRaw'])) {
+            foreach($rawQuery['whereRaw'] as $key => $val) {
+                $query->whereRaw($val[0], $val[1]);
+            }
+        }
 
         // Mối quan hệ giữa các bảng
         if(isset($relations) && !empty($relations)) {
             foreach ($relations as $relation) {
                 $query->withCount($relation);
+                $query->with($relation);
             }
         }
 
@@ -60,6 +68,11 @@ class BaseRepository implements BaseRepositoryInterface
             foreach($join as $key => $val) {
                 $query->join($val[0], $val[1], $val[2], $val[3]);
             }    
+        }
+
+        // Group by
+        if(isset($extend['groupBy']) && !empty($extend['groupBy'])) {
+            $query->groupBy($extend['groupBy']);
         }
 
         // Order by

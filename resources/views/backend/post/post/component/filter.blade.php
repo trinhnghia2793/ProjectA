@@ -24,10 +24,17 @@
 
                     @php
                         $publish = request('publish') ?: old('publish');
+                        $postCatalogueId = request('post_catalogue_id') ?: old('post_catalogue_id');
                     @endphp
                     <select name="publish" class="form-control mr10 setupSelect2">
                         @foreach (config('apps.general.publish') as $key => $val)
                             <option {{ ($publish == $key) ? 'selected' : '' }} value="{{ $key }}">{{ $val }}</option>
+                        @endforeach
+                    </select>
+                    {{--  --}}
+                    <select name="post_catalogue_id" class="form-control mr10 setupSelect2">
+                        @foreach ($dropdown as $key => $val)
+                            <option {{ ($postCatalogueId == $key) ? 'selected' : '' }} value="{{ $key }}">{{ $val }}</option>
                         @endforeach
                     </select>
 

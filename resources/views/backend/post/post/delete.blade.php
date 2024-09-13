@@ -10,7 +10,7 @@
     </div>
 @endif
 
-<form action="{{ route('post.post.destroy', $post->id) }}" method="post" class="box">
+<form action="{{ route('post.destroy', $post->id) }}" method="post" class="box">
     @csrf
     @method('DELETE')
     <div class="wrapper wrapper-content animated fadeInRight">
