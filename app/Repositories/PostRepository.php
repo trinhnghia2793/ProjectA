@@ -17,8 +17,6 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface
         $this->model = $model;   
     }
 
-    
-
     // Làm lấy ra Post dựa trên id (để tạm sửa sau)
     public function getPostById(int $id = 0, $language_id = 0) {
         return $this->model->select([

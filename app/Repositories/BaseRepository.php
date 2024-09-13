@@ -28,60 +28,20 @@ class BaseRepository implements BaseRepositoryInterface
         array $relations = [],
         array $rawQuery = [],
     ) {
-        $query = $this->model->select($column)->where(function($query) use ($condition) {
-            // Tìm kiếm theo keyword
-            if(isset($condition['keyword']) && !empty($condition['keyword'])) {
-                $query->where('name', 'LIKE', '%'.$condition['keyword'].'%');
-            }
+        // Select trong bảng
+        $query = $this->model->select($column);
 
-            // Tìm kiếm theo tình trạng publish
-            if(isset($condition['publish']) && $condition['publish'] != 0) {
-                $query->where('publish', '=', $condition['publish']);
-            }
-
-            // phần where mở rộng (dùng cho những thứ khác)
-            if(isset($condition['where']) && count($condition['where'])) {
-                foreach($condition['where'] as $key => $val) {
-                    $query->where($val[0], $val[1], $val[2]);
-                }
-            }
-            return $query;
-        });
-
-        // Raw Query: thêm vào từng câu truy vấn chay bắt được từ bên service
-        if(isset($rawQuery['whereRaw']) && count($rawQuery['whereRaw'])) {
-            foreach($rawQuery['whereRaw'] as $key => $val) {
-                $query->whereRaw($val[0], $val[1]);
-            }
-        }
-
-        // Mối quan hệ giữa các bảng
-        if(isset($relations) && !empty($relations)) {
-            foreach ($relations as $relation) {
-                $query->withCount($relation);
-                $query->with($relation);
-            }
-        }
-
-        // Join giữa các bảng
-        if(isset($join) && is_array($join) && count($join)) {
-            foreach($join as $key => $val) {
-                $query->join($val[0], $val[1], $val[2], $val[3]);
-            }    
-        }
-
-        // Group by
-        if(isset($extend['groupBy']) && !empty($extend['groupBy'])) {
-            $query->groupBy($extend['groupBy']);
-        }
-
-        // Order by
-        if(isset($orderBy) && !empty($orderBy)) {
-            $query->orderBy($orderBy[0], $orderBy[1]);
-        }
-
+        return $query   
+                    ->keyword($condition['keyword'] ?? null)
+                    ->publish($condition['publish'] ?? null)
+                    ->customWhere($condition['where'] ?? null)
+                    ->customWhereRaw($rawQuery['whereRaw'] ?? null)
+                    ->relationCount($relations ?? null)
+                    ->customJoin($join ?? null)
+                    ->customGroupBy($extend['groupBy'] ?? null)
+                    ->customOrderBy($orderBy ?? null)
         // Bước cuối: Trả về & phân trang
-        return $query->paginate($perPage)
+                    ->paginate($perPage)
                     ->withQueryString()
                     ->withPath(env('APP_URL').$extend['path']);
     }

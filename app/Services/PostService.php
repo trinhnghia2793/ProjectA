@@ -49,10 +49,7 @@ class PostService extends BaseService implements PostServiceInterface
             $this->paginateSelect(), 
             $condition, 
             $perPage,
-            [
-                'path' => 'post.index', 
-                'groupBy' => $this->paginateSelect(),
-            ],
+            ['path' => 'post.index', 'groupBy' => $this->paginateSelect(),],
             ['posts.id', 'DESC'], // order by // cái post nào mới (id to nhất) thì đưa lên trước
             [
                 ['post_language as tb2', 'tb2.post_id', '=' , 'posts.id'], // val[0], val[1], val[2], val[3]
