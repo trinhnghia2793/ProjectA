@@ -23,7 +23,7 @@
 
                 <div class="ibox">
                     <div class="ibox-title">
-                        <h5>Thông tin chung</h5>
+                        <h5>{{ __('messages.tableHeading') }}</h5>
                     </div>
                     <div class="ibox-content">
 
@@ -47,7 +47,7 @@
 
          <div class="text-right mb15 button-fix">
             <button class="btn btn-primary" type="submit" name="send" value="send">
-                Lưu lại
+                {{ __('messages.save') }}
             </button>
          </div>
     </div>

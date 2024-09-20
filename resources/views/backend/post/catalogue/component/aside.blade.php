@@ -1,12 +1,12 @@
 <div class="ibox w">
     <div class="ibox-title">
-        <h5>Chọn danh mục cha</h5>
+        <h5>{{ __('messages.parent') }}</h5>
     </div>
     <div class="ibox-content">
         <div class="row">
             <div class="col-lg-12">
                 <div class="form-row">
-                    <span class="text-danger notice">*Chọn Root nếu không có danh mục cha</span>
+                    <span class="text-danger notice">*{{ __('messages.parentNotice') }}</span>
                     <select name="parent_id" class="form-control setupSelect2" id="">
                         @foreach($dropdown as $key => $val)
                         <option 
@@ -23,7 +23,7 @@
 
 <div class="ibox w">
     <div class="ibox-title">
-        <h5>Chọn ảnh đại diện</h5>
+        <h5>{{ __('messages.image') }}</h5>
     </div>
     <div class="ibox-content">
         <div class="row">
@@ -37,7 +37,7 @@
 
 <div class="ibox w">
     <div class="ibox-title">
-        <h5>Cấu hình nâng cao</h5>
+        <h5>{{ __('messages.advanced') }}</h5>
     </div>
     <div class="ibox-content">
         <div class="row">
@@ -45,7 +45,7 @@
                 <div class="mb15">
                     {{-- Chọn trạng thái publish --}}
                     <select name="publish" class="form-control setupSelect2" id="">
-                        @foreach (config('apps.general.publish') as $key => $val)
+                        @foreach (__('messages.publish') as $key => $val)
                             <option 
                                 {{ $key == old('publish', (isset($postCatalogue->publish)) ? $postCatalogue->publish : '') ? 'selected' : '' }}
                                 value="{{ $key }}"
@@ -56,7 +56,7 @@
 
                 {{-- Chọn trạng thái follow/unfollow --}}
                 <select name="follow" class="form-control setupSelect2" id="">
-                    @foreach (config('apps.general.follow') as $key => $val)
+                    @foreach (__('messages.follow') as $key => $val)
                         <option 
                             {{ $key == old('follow', (isset($postCatalogue->follow)) ? $postCatalogue->follow : '') ? 'selected' : '' }}
                             value="{{ $key }}"

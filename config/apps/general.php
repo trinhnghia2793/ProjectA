@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     // Chọn tình trạng xuất bản
     'publish' => [
         0 => 'Chọn tình trạng',
@@ -15,7 +14,7 @@ return [
         1 => 'nofollow',
         2 => 'follow',
     ],
-
+    
     // Hậu tố .html
     'suffix' => '.html',
 ];
