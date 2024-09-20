@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('meta_keyword');
             $table->text('meta_description');
         });
+        // quên cài nullable cho mấy trường này :v
     }
 
     /**

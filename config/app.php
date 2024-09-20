@@ -78,11 +78,14 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    // Ngôn ngữ mặc định của hệ thống
+    'locale' => env('APP_LOCALE', 'vi'),
 
+    // Ngôn ngữ dự phòng trong trường hợp ngôn ngữ hiện tại sử dụng không có chuỗi đó
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    // Ngôn ngữ dùng cho faker library
+    'faker_locale' => env('APP_FAKER_LOCALE', 'vi_VN'),
 
     /*
     |--------------------------------------------------------------------------

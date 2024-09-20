@@ -17,13 +17,13 @@ use Illuminate\Support\Facades\Auth;
  */
 class LanguageService implements LanguageServiceInterface
 {
-    protected $LanguageRepository;
+    protected $languageRepository;
 
     public function __construct(
         LanguageRepository $languageRepository,
     )
     {
-        $this->LanguageRepository = $languageRepository;
+        $this->languageRepository = $languageRepository;
     }   
 
     // Phân trang
@@ -32,7 +32,7 @@ class LanguageService implements LanguageServiceInterface
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
         $perPage = $request->integer('perpage');
-        $languages = $this->LanguageRepository->pagination(
+        $languages = $this->languageRepository->pagination(
             $this->paginateSelect(), 
             $condition, 
             $perPage,
@@ -47,7 +47,7 @@ class LanguageService implements LanguageServiceInterface
         try {
             $payload = $request->except(['_token', 'send']);
             $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
-            $language = $this->LanguageRepository->create($payload);
+            $language = $this->languageRepository->create($payload);
             DB::commit();
             return true;
         }
@@ -64,7 +64,7 @@ class LanguageService implements LanguageServiceInterface
         DB::beginTransaction();
         try {
             $payload = $request->except(['_token', 'send']);
-            $language = $this->LanguageRepository->update($id, $payload);
+            $language = $this->languageRepository->update($id, $payload);
             DB::commit();
             return true;
         }
@@ -80,7 +80,7 @@ class LanguageService implements LanguageServiceInterface
     public function destroy($id) {
         DB::beginTransaction();
         try {
-            $language = $this->LanguageRepository->delete($id);
+            $language = $this->languageRepository->delete($id);
 
             DB::commit();
             return true;
@@ -98,9 +98,7 @@ class LanguageService implements LanguageServiceInterface
         DB::beginTransaction();
         try {
             $payload[$post['field']] = (($post['value'] == 1)?2:1);
-            $language = $this->LanguageRepository->update($post['modelId'], $payload);
-            // Chuyển tất cả bên User
-            // $this->changeUserStatus($post, $payload[$post['field']]);
+            $language = $this->languageRepository->update($post['modelId'], $payload);
             
             DB::commit();
             return true;
@@ -118,7 +116,7 @@ class LanguageService implements LanguageServiceInterface
         DB::beginTransaction();
         try {
             $payload[$post['field']] = $post['value'];
-            $flag = $this->LanguageRepository->updateByWhereIn('id', $post['id'], $payload);
+            $flag = $this->languageRepository->updateByWhereIn('id', $post['id'], $payload);
             // Chuyển tất cả bên User
             // $this->changeUserStatus($post, $post['value']);
             
@@ -133,30 +131,28 @@ class LanguageService implements LanguageServiceInterface
         }
     }
 
-    // Cập nhật tình trạng của tất cả User khi cập nhật tình trạng của Language
-    // private function changeUserStatus($post, $value) {
-    //     DB::beginTransaction();
-    //     try {
-    //         $array = [];
-    //         if(isset($post['modelId'])) {
-    //             $array[] = $post['modelId'];
-    //         }
-    //         else {
-    //             $array = $post['id'];
-    //         }    
-    //         $payload[$post['field']] = $value;
-    //         $this->userRepository->updateByWhereIn('user_catalogue_id', $array, $payload);
+    // Chuyển đổi ngôn ngữ cho cái được chọn & chuyển tất cả cái còn lại về 0
+    public function switch($id) {
+        DB::beginTransaction();
+        try {
+            $language = $this->languageRepository->update($id, ['current' => 1]);
+            $where = [
+                ['id', '!=', $id]
+            ];
+            $payload = ['current' => 0];
 
-    //         DB::commit();
-    //         return true;
-    //     }
-    //     catch(\Exception $e) {
-    //         DB::rollback();
-    //         echo $e->getMessage();
-    //         die();
-    //         return false;
-    //     }
-    // }
+            $this->languageRepository->updateByWhere($where, $payload);
+            
+            DB::commit();
+            return true;
+        }
+        catch(\Exception $e) {
+            DB::rollback();
+            echo $e->getMessage();
+            die();
+            return false;
+        }
+    }
 
     // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {

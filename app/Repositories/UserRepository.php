@@ -17,7 +17,7 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
         $this->model = $model;   
     }
 
-    // Truy vấn & phân trang
+    // Truy vấn & phân trang (override)
     public function pagination(
         array $column = ['*'], 
         array $condition = [], 

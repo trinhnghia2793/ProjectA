@@ -9,6 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    // Tạo bảng post_language
     public function up(): void
     {
         Schema::table('post_language', function (Blueprint $table) {

@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 interface PostCatalogueRepositoryInterface
 {
-    // Khai báo để chống báo lỗi
+    // Khai báo để chống báo lỗi bên service và controller
     public function pagination(
         array $column = ['*'], 
         array $condition = [], 
@@ -15,13 +15,16 @@ interface PostCatalogueRepositoryInterface
         array $relations = [],
         array $rawQuery = [],
     );
-    public function findById(int $id);
     public function create(array $payload = []);
     public function update(int $id = 0, array $payload = []);
-    public function delete(int $id = 0);
-    public function forceDelete(int $id = 0);
+    //public function updateByWhere($condition = [], array $payload = []);
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []);
-    public function createPivot($model, array $payload = []);
+    public function delete(int $id = 0);
+    //public function forceDelete(int $id = 0);
+    //public function all();
+    public function findById(int $id);
+    public function createPivot($model, array $payload = [], string $relation = '');
 
+    // Khai báo interface
     public function getPostCatalogueById(int $id = 0, $language_id = 0);
 }

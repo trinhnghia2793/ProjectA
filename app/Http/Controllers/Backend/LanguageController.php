@@ -11,6 +11,9 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepositor
 use App\Http\Requests\StoreLanguageRequest;
 use App\Http\Requests\UpdateLanguageRequest;
 
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
+
 class LanguageController extends Controller
 {
     protected $languageService;
@@ -134,6 +137,15 @@ class LanguageController extends Controller
                 'backend/library/finder.js',
             ],
         ];
+    }
+
+    // Hàm chuyển đổi ngôn ngữ
+    public function switchBackendLanguage($id) {
+        $language = $this->languageRepository->findById($id);
+        if($this->languageService->switch($id)) {
+            Session::put('locale', $language->canonical);
+        };
+        return back();
     }
 
 }

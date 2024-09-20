@@ -1,9 +1,4 @@
 <?php
-
-use Illuminate\Support\Facades\Route;
-
-// FILE NÀY COI NHƯ ĐÃ BỊ XÓA 
-// Menu Sidebar
 return [
     'module' => [
         // Quản lý bài viết
@@ -54,5 +49,3 @@ return [
         ]
     ],
 ];
-
-?>

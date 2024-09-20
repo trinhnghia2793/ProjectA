@@ -355,7 +355,9 @@ input[name=canonical] {
 .language-item {
     height: 60px;
     padding: 0;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
     margin-left: 10px;
+}
+
+.language-item.active {
+    background: #2962ff;
 }

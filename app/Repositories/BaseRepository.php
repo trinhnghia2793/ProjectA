@@ -57,8 +57,17 @@ class BaseRepository implements BaseRepositoryInterface
         $model = $this->findById($id);
         return $model->update($payload);
     }
+ 
+    // Cập nhật theo điều kiện where (đang dùng cho chuyển đổi ngôn ngữ)
+    public function updateByWhere($condition = [], array $payload = []) {
+        $query = $this->model->newQuery();
+        foreach($condition as $key => $val) {
+            $query->where($val[0], $val[1], $val[2]);
+        }
+        return $query->update($payload);
+    }
 
-    // Cập nhật theo where
+    // Cập nhật theo where in
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []) {
         return $this->model->whereIn($whereInField, $whereIn)->update($payload);
     }

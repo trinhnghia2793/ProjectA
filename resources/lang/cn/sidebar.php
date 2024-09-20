@@ -1,23 +1,18 @@
 <?php
-
-use Illuminate\Support\Facades\Route;
-
-// FILE NÀY COI NHƯ ĐÃ BỊ XÓA 
-// Menu Sidebar
 return [
     'module' => [
         // Quản lý bài viết
         [
             'name' => ['post'],
-            'title' => 'QL BÀI VIẾT',
+            'title' => '文章',
             'icon' => 'fa fa-file',
             'subModule' => [
                 [
-                    'title' => 'QL nhóm bài viết',
+                    'title' => '文章組',
                     'route' => 'post/catalogue/index'
                 ],
                 [
-                    'title' => 'QL bài viết',
+                    'title' => '文章',
                     'route' => 'post/index'
                 ]
             ]
@@ -26,15 +21,15 @@ return [
         // Quản lý thành viên
         [
             'name' => ['user'],
-            'title' => 'QL THÀNH VIÊN',
+            'title' => '用户组',
             'icon' => 'fa fa-user',
             'subModule' => [
                 [
-                    'title' => 'QL nhóm thành viên',
+                    'title' => '用户组',
                     'route' => 'user/catalogue/index'
                 ],
                 [
-                    'title' => 'QL thành viên',
+                    'title' => '用户',
                     'route' => 'user/index'
                 ]
             ]
@@ -43,16 +38,14 @@ return [
         // Ngôn ngữ
         [
             'name' => ['language'],
-            'title' => 'CẤU HÌNH CHUNG',
+            'title' => '一般的',
             'icon' => 'fa fa-file',
             'subModule' => [
                 [
-                    'title' => 'QL ngôn ngữ',
+                    'title' => '语言',
                     'route' => 'language/index'
                 ]
             ]
         ]
     ],
 ];
-
-?>

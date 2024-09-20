@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Services\Interfaces\UserCatalogueServiceInterface as UserCatalogueService;
 use App\Repositories\Interfaces\UserCatalogueRepositoryInterface as UserCatalogueRepository;
 
-// tạo lại, chưa đổi vì nó sẽ báo lỗi (cái gì z?)
 use App\Http\Requests\StoreUserCatalogueRequest;
 
 class UserCatalogueController extends Controller

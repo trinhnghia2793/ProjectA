@@ -15,11 +15,13 @@ interface BaseRepositoryInterface
         array $relations = [],
         array $rawQuery = [],
     );
-    public function all();
-    public function findById(int $id);
     public function create(array $payload = []);
     public function update(int $id = 0, array $payload = []);
-    public function delete(int $id = 0);
+    public function updateByWhere($condition = [], array $payload = []);
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []);
+    public function delete(int $id = 0);
+    public function forceDelete(int $id = 0);
+    public function all();
+    public function findById(int $id);
     public function createPivot($model, array $payload = [], string $relation = '');
 }

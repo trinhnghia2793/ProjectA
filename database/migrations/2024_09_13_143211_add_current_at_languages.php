@@ -9,11 +9,11 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // Thêm timestamps cho bảng post_catalogue_language
+    // Thêm cột current (ngôn ngữ hiện tại) cho bảng languages
     public function up(): void
     {
-        Schema::table('post_catalogue_language', function (Blueprint $table) {
-            $table->timestamps();
+        Schema::table('languages', function (Blueprint $table) {
+            $table->tinyInteger('current')->default(0);
         });
     }
 
@@ -22,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('post_catalogue_language', function (Blueprint $table) {
-            $table->dropTimestamps();
+        Schema::table('languages', function (Blueprint $table) {
+            $table->dropColumn('current');
         });
     }
 };
