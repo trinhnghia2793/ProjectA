@@ -6,6 +6,15 @@ use Illuminate\Support\Facades\Auth;
 // Class dùng để tính toán phân chia nhóm bài viết
 class Nestedsetbie{
 
+	private $params;
+	private $checked;
+	private $data;
+	private $count;
+	private $count_level;
+	private $lft;
+	private $rgt;
+	private $level;
+
 	function __construct($params = NULL){
 		$this->params = $params;
 		$this->checked = NULL;

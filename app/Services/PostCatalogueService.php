@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Services\Interfaces\PostCatalogueServiceInterface;
-use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
 use App\Services\BaseService;
+
+use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
+use App\Repositories\Interfaces\RouterRepositoryInterface as RouterRepository;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -21,15 +24,20 @@ use Illuminate\Support\Str;
 class PostCatalogueService extends BaseService implements PostCatalogueServiceInterface
 {
     protected $postCatalogueRepository;
+    protected $routerRepository;
     protected $nestedset;
     protected $language;
 
     public function __construct(
         PostCatalogueRepository $postCatalogueRepository,
+        RouterRepository $routerRepository,
     )
     {
         $this->language = $this->currentLanguage();
         $this->postCatalogueRepository = $postCatalogueRepository;
+        $this->routerRepository = $routerRepository;
+        $this->controllerName = 'PostCatalogueController';
+
         $this->nestedset = new Nestedsetbie([
             'table' => 'post_catalogues',
             'foreign_key' => 'post_catalogue_id',
@@ -37,17 +45,19 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         ]);
     }   
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // CRUD
+    
     // Phân trang
     public function paginate($request) {
-
-        $condition['keyword'] = addslashes($request->input('keyword'));
-        $condition['publish'] = $request->integer('publish');
-        $condition['where'] = [
-            ['tb2.language_id', '=', $this->language]
-        ];
-
         $perPage = $request->integer('perpage');
-
+        $condition = [
+            'keyword' => addslashes($request->input('keyword')),
+            'publish' => $request->integer('publish'),
+            'where' => [
+                ['tb2.language_id', '=', $this->language]
+            ],
+        ];
         $postCatalogues = $this->postCatalogueRepository->pagination(
             $this->paginateSelect(), 
             $condition, 
@@ -63,32 +73,17 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         return $postCatalogues;
     }
 
-    // Tạo một PostCatalogue
+    // Create PostCatalogue (create post cata -> update language -> update router -> adjust nestedset)
     public function create(Request $request) {
         DB::beginTransaction();
-        try {
-            $payload = $request->only($this->payload());
-            $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
-            $payload['album'] = json_encode($payload['album']);
-            $postCatalogue = $this->postCatalogueRepository->create($payload);
-
+        try {         
+            $postCatalogue = $this->createCatalogue($request);
             // Nếu create ở trên thành công (tức có dòng thêm vào : > 0) sẽ tiến hành thêm ở bảng language
             if($postCatalogue->id > 0) {
-                $payloadLanguage = $request->only($this->payloadLanguage());
-                $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
-                
-                $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
-
-                // Tạo một bản ghi mới
-                $language = $this->postCatalogueRepository->createPivot($postCatalogue, $payloadLanguage, 'languages');
+                $this->updateLanguageForCatalogue($postCatalogue, $request);
+                $this->createRouter($postCatalogue, $request, $this->controllerName);
+                $this->nestedset();
             }
-
-            // Tính toán lại các giá trị left - right
-            $this->nestedset->Get('level ASC', 'order ASC');
-            $this->nestedset->Recursive(0, $this->nestedset->Set());
-            $this->nestedset->Action();
-
             DB::commit();
             return true;
         }
@@ -100,32 +95,18 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         }
     }
 
-    // Update thông tin (nghe đâu là xóa đi bản cũ xong insert mới lại?????)
+    // Update PostCatalogue (update post cata -> update language -> update router -> adjust nestedset)
     public function update($id, $request) {
         DB::beginTransaction();
         try {
-            // Tìm postCatalogue
+            // Tìm PostCatalogue theo Id
             $postCatalogue = $this->postCatalogueRepository->findById($id);
-
-            $payload = $request->except(['_token', 'send']);
-            $payload['album'] = json_encode($payload['album']);
-            $flag = $this->postCatalogueRepository->update($id, $payload);
-            if($flag == TRUE) { // Nếu update thành công vào bảng thì bắt lại
-                $payloadLanguage = $request->only($this->payloadLanguage());
-                $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['post_catalogue_id'] = $id;
-
-                // detach: xóa một bản ghi khỏi bảng pivot
-                $postCatalogue->languages()->detach([$payloadLanguage['language_id'], $id]);
-                // tạo lại bản ghi mới
-                $response = $this->postCatalogueRepository->createPivot($postCatalogue, $payloadLanguage, 'languages');
-
-                // Tính toán lại các giá trị left - right
-                $this->nestedset->Get('level ASC', 'order ASC');
-                $this->nestedset->Recursive(0, $this->nestedset->Set());
-                $this->nestedset->Action();
+            // Nếu update thành công vào bảng thì bắt lại
+            if($this->updateCatalogue($postCatalogue, $request) == TRUE) { 
+                $this->updateLanguageForCatalogue($postCatalogue, $request);
+                $this->updateRouter($postCatalogue, $request, $this->controllerName);                
+                $this->nestedset();
             }
-
             DB::commit();
             return true;
         }
@@ -158,6 +139,54 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
             return false;
         }
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTION CHO CREATE & UPDATE
+
+    // Format language payload
+    private function formatLanguagePayload($postCatalogue, $request) {
+        $payload = $request->only($this->payloadLanguage());
+        $payload['canonical'] = Str::slug($payload['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL) 
+        $payload['language_id'] = $this->currentLanguage();
+        $payload['post_catalogue_id'] = $postCatalogue->id;
+
+        return $payload;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTION CHO CREATE
+
+    // Create Post Catalogue
+    private function createCatalogue($request) {
+        $payload = $request->only($this->payload());
+        $payload['album'] = $this->formatAlbum($request);
+        $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
+        $postCatalogue = $this->postCatalogueRepository->create($payload);
+        return $postCatalogue;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // FUNCTION CHO UPDATE
+    
+    // Update Post Catalogue
+    private function updateCatalogue($postCatalogue, $request) {
+        // Tìm postCatalogue
+        $payload = $request->except(['_token', 'send']);
+        $payload['album'] = $this->formatAlbum($request);
+        $flag = $this->postCatalogueRepository->update($postCatalogue->id, $payload);
+        return $flag;
+    }
+
+    // Update Language cho post catalogue
+    private function updateLanguageForCatalogue($postCatalogue, $request) {
+        $payload = $this->formatLanguagePayload($postCatalogue, $request);
+        $postCatalogue->languages()->detach([$this->language, $postCatalogue->id]);
+        // Tạo một bản ghi mới
+        $language = $this->postCatalogueRepository->createPivot($postCatalogue, $payload, 'languages');
+        return $language;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Cập nhật tình trạng của 1 bản ghi (switch)
     public function updateStatus($post = []) {
@@ -197,7 +226,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
             die();
             return false;
         }
-    }
+    }   
 
     // Chọn những trường cần xuất hiện & được phân trang
     private function paginateSelect() {

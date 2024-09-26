@@ -20,8 +20,9 @@ interface LanguageRepositoryInterface
     public function updateByWhere($condition = [], array $payload = []);
     public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []);
     public function delete(int $id = 0);
-    //public function forceDelete(int $id = 0);
+    // public function forceDelete(int $id = 0);
     public function all();
     public function findById(int $id);
-    //public function createPivot($model, array $payload = [], string $relation = '');
+    // public function findByCondition($condition = []);
+    // public function createPivot($model, array $payload = [], string $relation = '');
 }

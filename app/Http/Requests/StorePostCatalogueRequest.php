@@ -24,7 +24,7 @@ class StorePostCatalogueRequest extends FormRequest
         // Định nghĩa các rule cho các trường cần nhập
         return [
             'name' => 'required',
-            'canonical' => 'required|unique:post_catalogue_language',
+            'canonical' => 'required|unique:routers',
         ];
     }
 

@@ -24,7 +24,7 @@ class UpdatePostCatalogueRequest extends FormRequest
         // Định nghĩa các rule cho các trường cần nhập
         return [
             'name' => 'required',
-            'canonical' => 'required|unique:post_catalogue_language,canonical,' . $this->id . ',post_catalogue_id',
+            'canonical' => 'required|unique:routers,canonical,' . $this->id . ',module_id',
         ];
     }
 

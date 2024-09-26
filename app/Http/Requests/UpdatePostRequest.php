@@ -24,7 +24,7 @@ class UpdatePostRequest extends FormRequest
         // Định nghĩa các rule cho các trường cần nhập
         return [
             'name' => 'required',
-            'canonical' => 'required|unique:post_language,canonical,' . $this->id . ',post_id',
+            'canonical' => 'required|unique:routers,canonical,' . $this->id . ',module_id',
             'post_catalogue_id' => 'gt:0',
         ];
     }

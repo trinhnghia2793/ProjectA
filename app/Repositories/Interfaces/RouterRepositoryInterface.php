@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Interfaces;
 
-interface DistrictRepositoryInterface
+interface RouterRepositoryInterface
 {
     // Khai báo để chống báo lỗi bên service và controller
     // public function pagination(
@@ -15,17 +15,17 @@ interface DistrictRepositoryInterface
     //     array $relations = [],
     //     array $rawQuery = [],
     // );
-    // public function create(array $payload = []);
-    // public function update(int $id = 0, array $payload = []);
+    public function create(array $payload = []);
+    public function update(int $id = 0, array $payload = []);
     // public function updateByWhere($condition = [], array $payload = []);
     // public function updateByWhereIn($whereInField = '', array $whereIn = [], array $payload = []);
     // public function delete(int $id = 0);
     // public function forceDelete(int $id = 0);
     // public function all();
     // public function findById(int $id);
-    // public function findByCondition($condition = []);
+    public function findByCondition($condition = []);
     // public function createPivot($model, array $payload = [], string $relation = '');
 
     // Khai báo interface
-    public function findDistrictByProvinceId(int $province_id);
+    
 }

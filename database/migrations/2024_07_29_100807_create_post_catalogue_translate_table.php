@@ -20,11 +20,11 @@ return new class extends Migration
             $table->unsignedBigInteger('language_id');
             $table->foreign('language_id')->references('id')->on('languages')->onDelete('cascade');
             $table->string('name');
-            $table->text('description');
-            $table->longText('content');
-            $table->string('meta_title');
-            $table->string('meta_keyword');
-            $table->text('meta_description');
+            $table->text('description'); // chỗ này đã được sửa tay thành nullable()
+            $table->longText('content'); // chỗ này đã được sửa tay thành nullable()
+            $table->string('meta_title'); // chỗ này đã được sửa tay thành nullable()
+            $table->string('meta_keyword'); // chỗ này đã được sửa tay thành nullable()
+            $table->text('meta_description'); // chỗ này đã được sửa tay thành nullable()
         });
         // quên cài nullable cho mấy trường này :v
     }

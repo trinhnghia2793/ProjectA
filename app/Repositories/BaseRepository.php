@@ -96,6 +96,15 @@ class BaseRepository implements BaseRepositoryInterface
         return $this->model->select($column)->with($relation)->findOrFail($modelId);
     }
 
+    // Tìm theo điều kiện (khác Id)
+    public function findByCondition($condition = []) {
+        $query = $this->model->newQuery();
+        foreach($condition as $key => $val) {
+            $query->where($val[0], $val[1], $val[2]);
+        }
+        return $query->first();
+    }
+
     // attach: thêm một bản ghi vào bảng pivot (bảng pivot là bảng sinh ra từ mối quan hệ n-n)
     // detach: ngược lại
     // Thêm bảng Pivot (cái này có thời gian ngồi nghiên cứu sau)

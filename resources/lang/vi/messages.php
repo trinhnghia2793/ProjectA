@@ -62,5 +62,5 @@ return [
     'generalTitle' => '- Bạn đang muốn xóa ngôn ngữ có tên là',
     'generalDescription' => '- Lưu ý: Không thể khôi phục ngôn ngữ sau khi xóa. Hãy chắc chắn bạn muốn thực hiện chức năng này.',
     'deleteButton' => 'Xóa dữ liệu',
-    'save' => 'Xóa dữ liệu',
+    'save' => 'Lưu lại',
 ];

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\Interfaces\PostServiceInterface;
 use App\Repositories\Interfaces\PostRepositoryInterface as PostRepository;
+use App\Repositories\Interfaces\RouterRepositoryInterface as RouterRepository;
 use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,14 +21,18 @@ use Illuminate\Support\Str;
 class PostService extends BaseService implements PostServiceInterface
 {
     protected $postRepository;
+    protected $routerRepository;
     protected $language;
 
     public function __construct(
         PostRepository $postRepository,
+        RouterRepository $routerRepository,
     )
     {
         $this->language = $this->currentLanguage();
         $this->postRepository = $postRepository;
+        $this->routerRepository = $routerRepository;
+        $this->controllerName = 'PostController';
     }   
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +66,7 @@ class PostService extends BaseService implements PostServiceInterface
         return $posts;
     }
 
-    // Create Post
+    // Create Post (create post -> update language -> update catalogue -> create router)
     public function create(Request $request) {
         DB::beginTransaction();
         try {
@@ -69,9 +74,9 @@ class PostService extends BaseService implements PostServiceInterface
             $post = $this->createPost($request);
             // Nếu create ở trên thành công (tức có dòng thêm vào : > 0)
             if($post->id > 0) {
-                // Update Language và Catalogue
                 $this->updateLanguageForPost($post, $request);
                 $this->updateCatalogueForPost($post, $request);               
+                $this->createRouter($post, $request, $this->controllerName);
             }
             DB::commit();
             return true;
@@ -84,16 +89,17 @@ class PostService extends BaseService implements PostServiceInterface
         }
     }
 
-    // Update thông tin (nghe đâu là xóa đi bản cũ xong insert mới lại?????)
+    // Update thông tin (update post -> update language -> update catalogue -> update router)
     public function update($id, $request) {
         DB::beginTransaction();
         try {
-            // Tìm postCatalogue
+            // Tìm Post theo Id
             $post = $this->postRepository->findById($id);
             // Nếu update thành công vào bảng thì bắt lại
-            if($this->uploadPost($post, $request) == TRUE) { 
+            if($this->updatePost($post, $request) == TRUE) { 
                 $this->updateLanguageForPost($post, $request);
                 $this->updateCatalogueForPost($post, $request);
+                $this->updateRouter($post, $request, $this->controllerName);
             }
             DB::commit();
             return true;
@@ -126,18 +132,12 @@ class PostService extends BaseService implements PostServiceInterface
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTION CHO CREATE & UPDATE
 
-    // Format Album
-    private function formatAlbum($request) {
-        //return (isset($payload['album']) && !empty($payload['album'])) ? json_encode($payload['album']) : '';
-        //return (isset($album) && !empty($album)) ? json_encode($album) : '';
-        return ($request->input('album') && !empty($request->input('album'))) ? json_encode($request->input('album')) : '';
-    }
-
-    // Format Language
+    // Format Language payload
     private function formatLanguagePayload($payload, $postId) {
         $payload['canonical'] = Str::slug($payload['canonical']); // slug là hàm tạo chuỗi không dấu (dùng trong URL)
         $payload['language_id'] = $this->currentLanguage();
         $payload['post_id'] = $postId;
+
         return $payload;
     }
 
@@ -157,14 +157,14 @@ class PostService extends BaseService implements PostServiceInterface
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // FUNCTION CHO UPDATE
 
-    // Tiến hành upload Post
-    private function uploadPost($post, $request) {
+    // Update Post
+    private function updatePost($post, $request) {
         $payload = $request->only($this->payload());
         $payload['album'] = $this->formatAlbum($request);
         return $this->postRepository->update($post->id, $payload);
     }
 
-    // Update language cho Post
+    // Update Language cho Post
     private function updateLanguageForPost($post, $request) {
         $payload = $request->only($this->payloadLanguage());
         $payload = $this->formatLanguagePayload($payload, $post->id);
