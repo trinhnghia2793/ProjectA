@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Services\Interfaces\LanguageServiceInterface;
-use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepository;
+use App\Services\Interfaces\PermissionServiceInterface;
+use App\Repositories\Interfaces\PermissionRepositoryInterface as PermissionRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -12,18 +12,18 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Class LanguageService
+ * Class PermissionService
  * @package App\Services
  */
-class LanguageService implements LanguageServiceInterface
+class PermissionService implements PermissionServiceInterface
 {
-    protected $languageRepository;
+    protected $permissionRepository;
 
     public function __construct(
-        LanguageRepository $languageRepository,
+        PermissionRepository $permissionRepository,
     )
     {
-        $this->languageRepository = $languageRepository;
+        $this->permissionRepository = $permissionRepository;
     }   
 
     // Phân trang
@@ -32,22 +32,22 @@ class LanguageService implements LanguageServiceInterface
         $condition['keyword'] = addslashes($request->input('keyword'));
         $condition['publish'] = $request->integer('publish');
         $perPage = $request->integer('perpage');
-        $languages = $this->languageRepository->pagination(
+        $permissions = $this->permissionRepository->pagination(
             $this->paginateSelect(), 
             $condition, 
             $perPage,
-            ['path' => '/language/index'], 
+            ['path' => '/permission/index'], 
         );
-        return $languages;
+        return $permissions;
     }
 
-    // Tạo một Language
+    // Tạo một Permission
     public function create(Request $request) {
         DB::beginTransaction();
         try {
             $payload = $request->except(['_token', 'send']);
             $payload['user_id'] = Auth::id(); // lấy id là id của người đang thêm vào
-            $language = $this->languageRepository->create($payload);
+            $permission = $this->permissionRepository->create($payload);
             DB::commit();
             return true;
         }
@@ -64,7 +64,7 @@ class LanguageService implements LanguageServiceInterface
         DB::beginTransaction();
         try {
             $payload = $request->except(['_token', 'send']);
-            $language = $this->languageRepository->update($id, $payload);
+            $permission = $this->permissionRepository->update($id, $payload);
             DB::commit();
             return true;
         }
@@ -80,7 +80,7 @@ class LanguageService implements LanguageServiceInterface
     public function destroy($id) {
         DB::beginTransaction();
         try {
-            $language = $this->languageRepository->delete($id);
+            $permission = $this->permissionRepository->delete($id);
 
             DB::commit();
             return true;
@@ -98,50 +98,7 @@ class LanguageService implements LanguageServiceInterface
         DB::beginTransaction();
         try {
             $payload[$post['field']] = (($post['value'] == 1)?2:1);
-            $language = $this->languageRepository->update($post['modelId'], $payload);
-            
-            DB::commit();
-            return true;
-        }
-        catch(\Exception $e) {
-            DB::rollback();
-            echo $e->getMessage();
-            die();
-            return false;
-        }
-    }
-
-    // Cập nhật tình trạng của tất cả bản ghi được tick (toolbox)
-    public function updateStatusAll($post) {
-        DB::beginTransaction();
-        try {
-            $payload[$post['field']] = $post['value'];
-            $flag = $this->languageRepository->updateByWhereIn('id', $post['id'], $payload);
-            // Chuyển tất cả bên User
-            // $this->changeUserStatus($post, $post['value']);
-            
-            DB::commit();
-            return true;
-        }
-        catch(\Exception $e) {
-            DB::rollback();
-            echo $e->getMessage();
-            die();
-            return false;
-        }
-    }
-
-    // Chuyển đổi ngôn ngữ cho cái được chọn & chuyển tất cả cái còn lại về 0
-    public function switch($id) {
-        DB::beginTransaction();
-        try {
-            $language = $this->languageRepository->update($id, ['current' => 1]);
-            $where = [
-                ['id', '!=', $id]
-            ];
-            $payload = ['current' => 0];
-
-            $this->languageRepository->updateByWhere($where, $payload);
+            $permission = $this->permissionRepository->update($post['modelId'], $payload);
             
             DB::commit();
             return true;
@@ -160,8 +117,6 @@ class LanguageService implements LanguageServiceInterface
             'id', 
             'name', 
             'canonical', 
-            'publish', 
-            'image'
         ];
     }
 }

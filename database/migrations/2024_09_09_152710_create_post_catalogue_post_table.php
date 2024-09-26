@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // Tạo bảng post_catalogue_post
+    // Tạo bảng post_catalogue_post (bảng pivot từ post_catalouge & post)
     public function up(): void
     {
         Schema::create('post_catalogue_post', function (Blueprint $table) {

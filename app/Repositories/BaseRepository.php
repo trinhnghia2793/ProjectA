@@ -82,9 +82,9 @@ class BaseRepository implements BaseRepositoryInterface
         return $this->findById($id)->forceDelete();
     }
 
-    // Tất cả (chắc chả thèm dùng)
-    public function all() {
-        return $this->model->all();
+    // Lấy ra tất cả
+    public function all(array $relation = []) {
+        return $this->model->with($relation)->get();
     }
 
     // Tìm theo Id

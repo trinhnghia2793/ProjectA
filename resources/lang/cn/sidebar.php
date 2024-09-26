@@ -31,6 +31,10 @@ return [
                 [
                     'title' => '用户',
                     'route' => 'user/index'
+                ],
+                [
+                    'title' => '允许',
+                    'route' => 'permission/index'
                 ]
             ]
         ],

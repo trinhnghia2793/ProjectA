@@ -31,6 +31,10 @@ return [
                 [
                     'title' => 'User',
                     'route' => 'user/index'
+                ],
+                [
+                    'title' => 'Permissions',
+                    'route' => 'permission/index'
                 ]
             ]
         ],

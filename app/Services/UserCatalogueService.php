@@ -31,9 +31,10 @@ class UserCatalogueService implements UserCatalogueServiceInterface
 
     // Phân trang
     public function paginate($request) {
-
-        $condition['keyword'] = addslashes($request->input('keyword'));
-        $condition['publish'] = $request->integer('publish');
+        $condition = [
+            'keyword' => addslashes($request->input('keyword')),
+            'publish' => $request->integer('publish'),
+        ];
         $perPage = $request->integer('perpage');
         $userCatalogues = $this->userCatalogueRepository->pagination(
             $this->paginateSelect(), 
@@ -164,9 +165,39 @@ class UserCatalogueService implements UserCatalogueServiceInterface
             return false;
         }
     }
+
+    // Lưu những quyền cấp cho nhóm thành viên lại vào trong bảng user_catalogue_permission
+    public function setPermission($request) {
+        DB::beginTransaction();
+        try {
+            
+            $permissions = $request->input('permission');
+            if(count($permissions)) {
+                foreach($permissions as $key => $val) {
+                    $userCatalogue = $this->userCatalogueRepository->findById($key);
+                    // Insert vào bảng pivot
+                    $userCatalogue->permissions()->detach();
+                    $userCatalogue->permissions()->sync($val);
+                }
+            }
+            DB::commit();
+            return true;
+        }
+        catch(\Exception $e) {
+            DB::rollback();
+            echo $e->getMessage();
+            die();
+            return false;
+        }
+    }
     
     // Chọn những trường cần được phân trang
     private function paginateSelect() {
-        return ['id', 'name', 'description', 'publish'];
+        return [
+            'id', 
+            'name', 
+            'description', 
+            'publish'
+        ];
     }
 }

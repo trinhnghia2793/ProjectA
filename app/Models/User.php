@@ -59,8 +59,14 @@ class User extends Authenticatable
         ];
     }
 
-    // Mối quan hệ
+    // Mối quan hệ với bảng user_catalogue
     public function user_catalogues() {
         return $this->belongsTo(UserCatalogue::class, 'user_catalogue_id', 'id');
     }
+
+    // Check nhóm người dùng có quyền truy cập vào canonical nào đó không
+    public function hasPermission($permissionCanonical) {
+        return $this->user_catalogues->permissions->contains('canonical', $permissionCanonical);
+    }
+
 }

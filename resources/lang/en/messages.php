@@ -20,6 +20,50 @@ return [
 
     ],
 
+    'postCatalogue' => [
+        'index' => [
+            'title' => 'Manage user groups',
+            'table' => 'User group list',
+        ],
+
+        'create' => [
+            'title' => 'Add new user group'
+        ],
+        
+        'edit' => [
+            'title' => 'Update user group'
+        ],
+
+        'delete' => [
+            'title' => 'Delete user group'
+        ],
+    
+        'permission' => [
+            'title' => 'Update permissions'
+        ],
+
+    ],
+
+    'permission' => [
+        'index' => [
+            'title' => 'Quản lý quyền',
+            'table' => 'Danh sách quyền',
+        ],
+
+        'create' => [
+            'title' => 'Thêm mới quyền'
+        ],
+        
+        'edit' => [
+            'title' => 'Cập nhật quyền'
+        ],
+
+        'delete' => [
+            'title' => 'Xóa quyền'
+        ],
+
+    ],
+
     // Select publication status
     'publish' => [
         0 => 'Select status',

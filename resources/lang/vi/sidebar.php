@@ -20,7 +20,7 @@ return [
                 
         // Quản lý thành viên
         [
-            'name' => ['user'],
+            'name' => ['user', 'permission'],
             'title' => 'QL THÀNH VIÊN',
             'icon' => 'fa fa-user',
             'subModule' => [
@@ -31,6 +31,10 @@ return [
                 [
                     'title' => 'QL thành viên',
                     'route' => 'user/index'
+                ],
+                [
+                    'title' => 'QL quyền',
+                    'route' => 'permission/index'
                 ]
             ]
         ],
