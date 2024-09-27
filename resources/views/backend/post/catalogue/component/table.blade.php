@@ -5,14 +5,10 @@
                 <input type="checkbox" value="" id="checkAll" class="input-checkbox">
             </th>
             <th>{{ __('messages.tableName') }}</th>
-            @foreach($languages as $language) 
-                @if (Session::get('locale') === $language->canonical)
-                    @continue;
-                @endif
-                <th class="text-center">
-                    <span class="image img-scaledown language-flag"><img src="{{ $language->image }}" alt=""></span>
-                </th>
-            @endforeach
+
+            {{-- Danh sách các lá cờ --}}
+            @include('backend.dashboard.component.languageTh')
+
             <th class="text-center" style="width: 100px">{{ __('messages.tableStatus') }}</th>
             <th class="text-center" style="width: 100px">{{ __('messages.tableAction') }}</th>
         </tr>
@@ -28,14 +24,10 @@
                         {{-- Với mỗi level > 0 sẽ cài thêm cái '|----' vào để phân cấp bậc --}}
                         {{ str_repeat('|----', ( ($postCatalogue->level > 0) ? ($postCatalogue->level - 1) : 0 )) . $postCatalogue->name }}
                     </td>
-                    @foreach($languages as $language) 
-                        @if (Session::get('locale') === $language->canonical)
-                            @continue;
-                        @endif
-                        <td class="text-center">
-                            <a href="{{ route('language.translate', ['id' => $postCatalogue->id, 'languageId' => $language->id, 'model' => 'PostCatalogue']) }}">Chưa dịch</a>
-                        </td>
-                    @endforeach
+
+                    {{-- Danh sách đã dịch - chưa dịch --}}
+                    @include('backend.dashboard.component.languageTd', ['model' => $postCatalogue, 'modeling' => 'PostCatalogue'])
+
                     <td class="text-center js-switch-{{ $postCatalogue->id }}"> 
                         <input type="checkbox" value="{{ $postCatalogue->publish }}" class="js-switch status" data-field="publish" data-model="{{ $config['model'] }}" {{ ($postCatalogue->publish == 2) ? 'checked' : '' }} data-modelId="{{ $postCatalogue->id }}" />
                     </td>

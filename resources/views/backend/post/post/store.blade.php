@@ -32,8 +32,8 @@
                     </div>
                 </div>
 
-                @include('backend.dashboard.component.album')
-                @include('backend.post.post.component.seo')
+                @include('backend.dashboard.component.album', ['model' => ($post) ?? null])
+                @include('backend.dashboard.component.seo', ['model' => ($post) ?? null])
 
             </div>
 

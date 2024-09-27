@@ -14,10 +14,13 @@ use App\Http\Requests\DeletePostRequest; // Không có cái này
 
 use App\Classes\Nestedsetbie;
 
+use App\Models\Language;
+
 class PostController extends Controller
 {
     protected $postService;
     protected $postRepository;
+    protected $languageRepository;
     protected $language;
     
     protected $nestedset;
@@ -27,23 +30,35 @@ class PostController extends Controller
         PostService $postService,
         PostRepository $postRepository,
     ){
+        $this->middleware(function($request, $next) {
+            $locale = app()->getLocale();
+            $language = Language::where('canonical', $locale)->first();
+            $this->language = $language->id;
+            $this->initialize();
+            return $next($request);
+        });
+
         $this->postService = $postService;
         $this->postRepository = $postRepository;
+        $this->initialize();
 
+        //$this->language = $this->currentLanguage();
+    }
+
+    // Initialize: lazy load nested set
+    private function initialize() {
         $this->nestedset = new Nestedsetbie([
             'table' => 'post_catalogues',
             'foreign_key' => 'post_catalogue_id',
-            'language_id' => 1, // tạm thời đê là 1
+            'language_id' => $this->language,
         ]);
-
-        $this->language = $this->currentLanguage();
     }
 
     // Index
     public function index(Request $request) {
         $this->authorize('modules', 'post.index');
 
-        $posts = $this->postService->paginate($request);
+        $posts = $this->postService->paginate($request, $this->language);
 
         $config = [
             'js' => [
@@ -89,7 +104,7 @@ class PostController extends Controller
 
     // Store data
     public function store(StorePostRequest $request) {
-        if($this->postService->create($request)) {
+        if($this->postService->create($request, $this->language)) {
             toastr()->success("Thêm mới bản ghi thành công.");
             return redirect()->route('post.index');
         }
@@ -123,7 +138,7 @@ class PostController extends Controller
 
     // Update
     public function update($id, UpdatePostRequest $request) {
-        if($this->postService->update($id, $request)) {
+        if($this->postService->update($id, $request, $this->language)) {
             toastr()->success("Cập nhật bản ghi thành công.");
             return redirect()->route('post.index');
         }

@@ -5,6 +5,10 @@
                 <input type="checkbox" value="" id="checkAll" class="input-checkbox">
             </th>
             <th>Tiêu đề</th>
+
+            {{-- Danh sách các lá cờ --}}
+            @include('backend.dashboard.component.languageTh')
+
             <th style="width: 80px;" class="text-center">Sắp xếp</th>
             <th class="text-center" style="width: 100px">Tình trạng</th>
             <th class="text-center" style="width: 100px">Thao tác</th>
@@ -36,6 +40,10 @@
                             </div>
                         </div>
                     </td>
+
+                    {{-- Danh sách đã dịch - chưa dịch --}}
+                    @include('backend.dashboard.component.languageTd', ['model' => $post, 'modeling' => 'Post'])
+
                     <td>
                         <input type="text" name="order" value="{{ $post->order }}" class="form-control sort-order text-right" data-id="{{ $post->id }}" data-model="{{ $config['model'] }}">
                     </td>

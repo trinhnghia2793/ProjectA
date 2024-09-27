@@ -33,7 +33,7 @@ class Post extends Model
             'canonical',
             'meta_title',
             'meta_keyword',
-            'meta-description',
+            'meta_description',
             'description',
             'content'
         )->withTimestamps();

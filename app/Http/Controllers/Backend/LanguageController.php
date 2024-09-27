@@ -165,8 +165,9 @@ class LanguageController extends Controller
 
         // Lấy ra repository -> lấy hàm để truy xuất thông tin
         $repositoryInstance = $this->repositoryInstance($model);
-        $object = $repositoryInstance->getPostCatalogueById($id, $currentLanguage->id); // cái hiện tại
-        $objectTranslate = $repositoryInstance->getPostCatalogueById($id, $languageId); // cái cần dịch
+        $method = 'get' . $model . 'ById';
+        $object = $repositoryInstance->{$method}($id, $currentLanguage->id); // cái hiện tại
+        $objectTranslate = $repositoryInstance->{$method}($id, $languageId); // cái cần dịch
 
         $config = [
             'js' => [

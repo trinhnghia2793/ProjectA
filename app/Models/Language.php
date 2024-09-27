@@ -26,11 +26,13 @@ class Language extends Model
     public function languages() {
         return $this->belongsToMany(PostCatalogue::class, 'post_catalogue_translate', 'language_id', 'post_catalogue_id')
         ->withPivot(
+            'post_catalogue_id',
+            'language_id',
             'name',
             'canonical',
             'meta_title',
             'meta_keyword',
-            'meta-description',
+            'meta_description',
             'description',
             'content'
         )->withTimestamps();

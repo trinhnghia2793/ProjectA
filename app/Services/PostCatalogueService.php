@@ -35,7 +35,8 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         RouterRepository $routerRepository,
     )
     {
-        $this->language = Session::get('locale');
+        $this->language = $this->currentLanguage();
+        //$this->language = Session::get('locale');
         $this->postCatalogueRepository = $postCatalogueRepository;
         $this->routerRepository = $routerRepository;
         $this->controllerName = 'PostCatalogueController';

@@ -33,11 +33,13 @@ class PostCatalogue extends Model
     public function languages() {
         return $this->belongsToMany(Language::class, 'post_catalogue_language', 'post_catalogue_id', 'language_id')
         ->withPivot(
+            'post_catalogue_id',
+            'language_id',
             'name',
             'canonical',
             'meta_title',
             'meta_keyword',
-            'meta-description',
+            'meta_description',
             'description',
             'content'
         )->withTimestamps();
@@ -50,7 +52,7 @@ class PostCatalogue extends Model
 
     // Mối quan hệ với bảng postCatalogueLanguage
     public function post_catalogue_language() {
-        return $this->hasMany(PostCatalogueLanguage::class, 'post_catalogue_id', 'id');
+        return $this->hasMany(PostCatalogueLanguage::class, 'post_catalogue_id', 'id')->where('language_id','=',1);
     }
 
     // Hàm kiểm tra node

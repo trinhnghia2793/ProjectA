@@ -171,7 +171,6 @@ class LanguageService implements LanguageServiceInterface
                 'language_id' => $option['languageId'],
 
             ];
-
             // 1. Lấy repository
             $repositoryNamespace = '\App\Repositories\\' . ucfirst($option['model']) . 'Repository';
             if(class_exists($repositoryNamespace)) {
