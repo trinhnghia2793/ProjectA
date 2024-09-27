@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Services\Interfaces\LanguageServiceInterface as LanguageService;
+
 use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepository;
 
 use App\Http\Requests\StoreLanguageRequest;
@@ -119,7 +120,6 @@ class LanguageController extends Controller
             'config',
             'language',
         ));
-
     }
 
     // Destroy
@@ -150,6 +150,59 @@ class LanguageController extends Controller
             Session::put('locale', $language->canonical);
         };
         return back();
+    }
+
+    // Hàm dịch ngôn ngữ (lần lượt là id bài viết, id ngôn ngữ cần dịch, tên model)
+    public function translate($id = 0, $languageId = 0, $model = '') {
+        $this->authorize('modules', 'language.translate');
+
+        // Lấy ra ngôn ngữ hiện tại (lấy repo của language -> lấy hàm ngôn ngữ hiện tại)
+        $languageInstance = $this->repositoryInstance('Language');
+        $currentLanguage = $languageInstance->findByCondition([
+            ['canonical', '=', Session::get('locale')]
+        ]);
+
+        // Lấy ra repository -> lấy hàm để truy xuất thông tin
+        $repositoryInstance = $this->repositoryInstance($model);
+        $object = $repositoryInstance->getPostCatalogueById($id, $currentLanguage->id); // cái hiện tại
+        $objectTranslate = $repositoryInstance->getPostCatalogueById($id, $languageId); // cái cần dịch
+
+        $config = [
+            'js' => [
+                // import ckeditor
+                'backend/plugins/ckeditor/ckeditor.js',
+
+                // import ckfinder_2 để upload ảnh
+                'backend/plugins/ckfinder_2/ckfinder.js',
+
+                // Add các file js chạy hàm
+                'backend/library/finder.js',
+                'backend/library/seo.js',
+
+                // switchery
+                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js'
+            ],
+            'css' => [
+                'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
+            ],
+        ];
+        $config['seo'] = config('apps.language'); // cái này để chuyển sau
+        $template = 'backend.language.translate';
+        return view('backend.dashboard.layout', compact(
+            'template',
+            'config',
+            'object',
+            'objectTranslate',
+        ));
+    }
+
+    // Tạo ra một instance của một repository dựa trên tên model
+    private function repositoryInstance($model) {
+        $repositoryNamespace = '\App\Repositories\\' . ucfirst($model) . 'Repository';
+        if(class_exists($repositoryNamespace)) {
+            $repositoryInstance = app($repositoryNamespace);
+        }
+        return $repositoryInstance ?? null;
     }
 
 }

@@ -19,7 +19,7 @@
         }  
     }
 
-    //
+    // Sortui
     HT.sortui = () => {
         $( "#sortable" ).sortable();
         $( "#sortable" ).disableSelection();

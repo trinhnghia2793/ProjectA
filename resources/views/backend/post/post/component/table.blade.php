@@ -5,7 +5,7 @@
                 <input type="checkbox" value="" id="checkAll" class="input-checkbox">
             </th>
             <th>Tiêu đề</th>
-            <th style="width: 80px;" class="text-center">Vị trí</th>
+            <th style="width: 80px;" class="text-center">Sắp xếp</th>
             <th class="text-center" style="width: 100px">Tình trạng</th>
             <th class="text-center" style="width: 100px">Thao tác</th>
         </tr>

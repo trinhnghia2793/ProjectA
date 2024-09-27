@@ -13,8 +13,11 @@
         })
 
         // tính độ dài đường link host để căn padding
-        $('input[name=canonical]').css({
-            'padding-left': parseInt($('.baseUrl').outerWidth()) + 10
+        $('.seo-canonical').each(function() {
+            let _this = $(this)
+            _this.css({
+                'padding-left': parseInt($('.baseUrl').outerWidth()) + 10
+            })
         })
 
         // Chỉnh canonical theo đường dẫn (canonical)
@@ -47,7 +50,6 @@
         str = str.replace(/^\-+|\-+$/g, "");
         return str;
     }
-
 
     // Gọi hàm để chạy
     $(document).ready(function() {

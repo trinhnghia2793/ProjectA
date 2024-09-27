@@ -14,6 +14,8 @@ use App\Http\Requests\DeletePostCatalogueRequest;
 
 use App\Classes\Nestedsetbie;
 
+use Illuminate\Support\Facades\Session;
+
 class PostCatalogueController extends Controller
 {
     protected $postCatalogueService;
