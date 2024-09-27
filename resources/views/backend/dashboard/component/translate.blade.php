@@ -4,7 +4,7 @@
             <label for="" class="control-label text-left">{{ __('messages.title') }}<span class="text-danger">(*)</span></label>
             <input 
                 type="text"
-                name="name"
+                name="translate_name"
                 value="{{ old('translate_name', ($model->name) ?? '' ) }}"
                 class="form-control"
                 placeholder=""

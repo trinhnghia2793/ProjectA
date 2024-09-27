@@ -8,13 +8,15 @@ use App\Services\BaseService;
 use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
 use App\Repositories\Interfaces\RouterRepositoryInterface as RouterRepository;
 
+use App\Classes\Nestedsetbie;
+use Illuminate\Support\Facades\Session;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use App\Classes\Nestedsetbie;
 use Illuminate\Support\Str;
 
 /**
@@ -33,7 +35,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
         RouterRepository $routerRepository,
     )
     {
-        $this->language = $this->currentLanguage();
+        $this->language = Session::get('locale');
         $this->postCatalogueRepository = $postCatalogueRepository;
         $this->routerRepository = $routerRepository;
         $this->controllerName = 'PostCatalogueController';

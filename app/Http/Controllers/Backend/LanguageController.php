@@ -11,6 +11,7 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepositor
 
 use App\Http\Requests\StoreLanguageRequest;
 use App\Http\Requests\UpdateLanguageRequest;
+use App\Http\Requests\TranslateRequest;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -186,6 +187,11 @@ class LanguageController extends Controller
                 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
             ],
         ];
+        $option = [
+            'id' => $id,
+            'languageId' => $languageId,
+            'model' => $model,
+        ];
         $config['seo'] = config('apps.language'); // cái này để chuyển sau
         $template = 'backend.language.translate';
         return view('backend.dashboard.layout', compact(
@@ -193,7 +199,19 @@ class LanguageController extends Controller
             'config',
             'object',
             'objectTranslate',
+            'option',
         ));
+    }
+
+    // Lưu lại bản dịch
+    public function storeTranslate(TranslateRequest $request) {
+        $option = $request->input('option');
+        if($this->languageService->saveTranslate($option, $request)) {
+            toastr()->success("Cập nhật bản ghi thành công.");
+            return redirect()->back();
+        }
+        toastr()->error("Có vấn đề xảy ra, vui lòng thử lại");
+        return redirect()->back();
     }
 
     // Tạo ra một instance của một repository dựa trên tên model
